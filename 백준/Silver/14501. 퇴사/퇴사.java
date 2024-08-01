@@ -13,8 +13,8 @@ public class Main {
             P[i] = Integer.parseInt(st.nextToken());
         }
         int[] dp = new int[100];
-        if(T[N]>1){
-            dp[N] = 0;
+        if(T[N]==1){
+            dp[N] = P[N];
         }
         for(int i = N; i>=1; i--){
             if(N-i+1<T[i]){
