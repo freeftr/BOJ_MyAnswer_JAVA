@@ -21,7 +21,7 @@ public class Main {
         Arrays.sort(province);
         long low = 0;
         long high = province[N-1];
-        long mid;
+        long mid = 0;
         while(low<=high){
             mid = (low+high)/2;
             long sum = 0;
