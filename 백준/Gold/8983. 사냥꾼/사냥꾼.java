@@ -23,7 +23,7 @@ public class Main {
         for(int i = 0; i < M; i++){
             gun[i] = Long.parseLong(st.nextToken());
         }
-
+        Arrays.sort(gun);
 
         for(int i = 0; i < N; i++){
             st = new StringTokenizer(br.readLine());
