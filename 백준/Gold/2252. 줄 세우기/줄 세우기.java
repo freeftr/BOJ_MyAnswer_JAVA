@@ -11,7 +11,7 @@ public class Main {
 
         ArrayList<ArrayList<Integer>> graph = new ArrayList<>();
         ArrayList<Integer> answer = new ArrayList<>();
-        PriorityQueue<Integer> pq = new PriorityQueue<>(Collections.reverseOrder());
+        Queue<Integer> pq = new LinkedList<>();
         long[] inDegree = new long[N+1];
 
         for(int i = 0; i <= N; i++){
