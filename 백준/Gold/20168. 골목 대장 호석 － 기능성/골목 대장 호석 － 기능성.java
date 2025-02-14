@@ -35,6 +35,9 @@ public class Main {
         }
         visited[A] = true;
         dfs(A, B, 0,0);
+        if (answer == Integer.MAX_VALUE) {
+            answer = -1;
+        }
         System.out.println(answer);
     }
 
