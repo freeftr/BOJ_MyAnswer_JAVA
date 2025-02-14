@@ -33,31 +33,26 @@ public class Main {
             graph.get(a).add(new int[]{b, c});
             graph.get(b).add(new int[]{a, c});
         }
+
         visited[A] = true;
-        dfs(A, B, 0,0);
-        if (answer == Integer.MAX_VALUE) {
-            answer = -1;
-        }
-        System.out.println(answer);
+        dfs(A, B, 0, 0);
+
+        System.out.println(answer == Integer.MAX_VALUE ? -1 : answer);
     }
 
     static void dfs(int v, int target, int maxCost, int sum) {
         if (sum > C) return;
-
-        if (v==target) {
+        if (v == target) {
             answer = Math.min(answer, maxCost);
             return;
         }
 
         for (int[] nv : graph.get(v)) {
             if (visited[nv[0]]) continue;
+
             visited[nv[0]] = true;
-            maxCost = Math.max(maxCost, nv[1]);
-            sum+=nv[1];
-            dfs(nv[0], target, maxCost, sum);
-            sum-=nv[1];
+            dfs(nv[0], target, Math.max(maxCost, nv[1]), sum + nv[1]);
             visited[nv[0]] = false;
         }
     }
-
 }
