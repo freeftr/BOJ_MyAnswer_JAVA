@@ -22,11 +22,11 @@ class Solution {
             long pair = num / j;
 
             if (pair <= 10000000) {
-                return pair;  // 조건에 맞는 큰 약수
+                return pair;  
             }
 
             if (j <= 10000000 && j > maxDivisor) {
-                maxDivisor = j;  // 조건을 만족하는 작은 약수 후보 저장
+                maxDivisor = j;  
             }
         }
 
