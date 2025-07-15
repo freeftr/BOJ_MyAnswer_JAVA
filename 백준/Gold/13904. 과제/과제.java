@@ -3,42 +3,39 @@ import java.util.*;
 
 public class Main {
 
-	static int N;
-	static PriorityQueue<Integer>[] hw;
+    public static void main(String[] args) throws IOException{
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st;
 
-	public static void main(String[] args) throws IOException {
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringTokenizer st;
+        int N = Integer.parseInt(br.readLine());
+        ArrayList<int[]> task = new ArrayList<>();
 
-		N = Integer.parseInt(br.readLine());
-		hw = new PriorityQueue[1001]; 
+        for (int i = 0; i < N; i++) {
+            st = new StringTokenizer(br.readLine());
 
-		for (int i = 0; i <= 1000; i++) {
-			hw[i] = new PriorityQueue<>((a, b) -> b - a); 
-		}
+            int d = Integer.parseInt(st.nextToken());
+            int w = Integer.parseInt(st.nextToken());
 
-		int max = 0;
+            task.add(new int[]{d, w});
+        }
 
-		for (int i = 0; i < N; i++) {
-			st = new StringTokenizer(br.readLine());
-			int d = Integer.parseInt(st.nextToken());
-			int w = Integer.parseInt(st.nextToken());
-			max = Math.max(max, d);
-			hw[d].add(w);
-		}
+        Collections.sort(task, (a, b) -> b[0] - a[0]);
+        PriorityQueue<Integer> pq = new PriorityQueue<>((a, b) -> b - a);
+        int answer = 0;
+        int idx = 0;
 
-		PriorityQueue<Integer> available = new PriorityQueue<>((a, b) -> b - a);
-		int sum = 0;
+        for (int i = task.get(0)[0]; i > 0; i--) {
+            while (idx < N && task.get(idx)[0] >= i) {
+                pq.add(task.get(idx)[1]);
+                idx++;
+            }
 
-		for (int i = max; i > 0; i--) {
-			while (!hw[i].isEmpty()) {
-				available.add(hw[i].poll());
-			}
-			if (!available.isEmpty()) {
-				sum += available.poll();
-			}
-		}
+            if (!pq.isEmpty()) {
+                answer += pq.poll();
+            }
+        }
 
-		System.out.println(sum);
-	}
+
+        System.out.println(answer);
+    }
 }
