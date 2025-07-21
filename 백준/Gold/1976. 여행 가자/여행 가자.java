@@ -1,74 +1,66 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.StringTokenizer;
+import java.io.*;
+import java.util.*;
 
 public class Main {
 
-	static int N, M;
-	static int[] parent, route;
+    static int N, M;
+    static int[][] graph;
+    static int[] plan, parent;
 
-	public static void main(String[] args) throws IOException {
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringTokenizer st;
+    public static void main(String[] args) throws IOException{
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st;
 
-		N = Integer.parseInt(br.readLine());
-		M = Integer.parseInt(br.readLine());
+        N = Integer.parseInt(br.readLine());
+        M = Integer.parseInt(br.readLine());
 
-		parent = new int[N];
-		route = new int[M];
+        graph = new int[N][N];
+        plan = new int[M];
+        parent = new int[N + 1];
 
-		for (int i = 0; i < N; i++) {
-			parent[i] = i;
-		}
+        for (int i = 1; i <= N; i++) {
+            parent[i] = i;
+        }
 
-		for (int i = 0; i < N; i++) {
-			st = new StringTokenizer(br.readLine());
-			for (int j = 0; j < N; j++) {
-				int a = Integer.parseInt(st.nextToken());
-				if (a==1){
-					union(i,j);
-				}
-			}
-		}
+        for (int i = 0; i < N; i++) {
+            st = new StringTokenizer(br.readLine());
+            for (int j = 0; j < N; j++) {
+                graph[i][j] = Integer.parseInt(st.nextToken());
+                if (graph[i][j] == 1) {
+                    union(i + 1, j + 1);
+                }
+            }
+        }
 
-		st = new StringTokenizer(br.readLine());
-		for (int i = 0; i < M; i++) {
-			route[i] = Integer.parseInt(st.nextToken())-1;
-		}
+        st = new StringTokenizer(br.readLine());
+        for (int i = 0; i < M; i++) {
+            plan[i] = Integer.parseInt(st.nextToken());
+        }
 
-		boolean flag = false;
-		for (int i = 1; i < M; i++) {
-			if (find(route[i]) != find(route[0])) {
-				flag = true;
-				break;
-			}
-		}
+        boolean possible = true;
+        int root = find(plan[0]);
 
-		if (flag) {
-			System.out.println("NO");
-		} else {
-			System.out.println("YES");
-		}
-	}
+        for (int i = 1; i < M; i++) {
+            if (find(plan[i]) != root) {
+                possible = false;
+                break;
+            }
+        }
 
-	static void union(int a, int b){
-		a = find(a);
-		b = find(b);
+        System.out.println(possible ? "YES" : "NO");
+    }
 
-		if (a > b) {
-			parent[a] = b;
-		} else {
-			parent[b] = a;
-		}
-	}
+    static int find(int v) {
+        if (v == parent[v]) return v;
+        return parent[v] = find(parent[v]);
+    }
 
-	static int find(int v){
-		if (parent[v] == v){
-			return v;
-		}
-		return parent[v] = find(parent[v]);
-	}
+    static void union(int a, int b) {
+        int rootA = find(a);
+        int rootB = find(b);
+
+        if (rootA != rootB) {
+            parent[rootB] = rootA;
+        }
+    }
 }
