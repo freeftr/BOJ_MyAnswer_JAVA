@@ -1,41 +1,114 @@
-import java.util.*;
-import java.lang.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.StringTokenizer;
+
 public class Main {
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        int S = sc.nextInt(), P = sc.nextInt();
-        String DNA = sc.next();
-        int A = sc.nextInt(), C = sc.nextInt(), G = sc.nextInt(), T = sc.nextInt();
-        int a = 0, c = 0, g = 0, t = 0;
-        int cnt = 0;
-        for(int i = 0; i < P; i++){
-            if(DNA.charAt(i) == 'A') a++;
-            else if(DNA.charAt(i) == 'C') c++;
-            else if(DNA.charAt(i) == 'G') g++;
-            else if(DNA.charAt(i) == 'T') t++;
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st;
+
+        HashMap<Character, Integer> map = new HashMap<>();
+        char[] letters = {'A', 'C', 'G', 'T'};
+
+        st = new StringTokenizer(br.readLine());
+
+        int S = Integer.parseInt(st.nextToken());
+        int P = Integer.parseInt(st.nextToken());
+
+        String s = br.readLine();
+
+        st = new StringTokenizer(br.readLine());
+        for (int i = 0; i < 4; i++) {
+            map.put(letters[i], Integer.parseInt(st.nextToken()));
         }
-        for(int i = 0; i < S - P; i++){
-            if(a >= A && c >= C && g >= G && t >= T) cnt++;
-            if(DNA.charAt(i) == 'A') a--;
-            else if(DNA.charAt(i) == 'C') c--;
-            else if(DNA.charAt(i) == 'G') g--;
-            else if(DNA.charAt(i) == 'T') t--;
-            if(DNA.charAt(i + P)== 'A') a++;
-            else if(DNA.charAt(i + P)== 'C') c++;
-            else if(DNA.charAt(i + P)== 'G') g++;
-            else if(DNA.charAt(i + P)== 'T') t++;
+
+        int left = 0;
+        int right = P - 1;
+        int A = 0;
+        int C = 0;
+        int G = 0;
+        int T = 0;
+
+        for (int i = 0; i < P; i++) {
+            if (s.charAt(i) == 'A') {
+                A++;
+            } else if (s.charAt(i) == 'C') {
+                C++;
+            } else if (s.charAt(i) == 'G') {
+                G++;
+            } else if (s.charAt(i) == 'T') {
+                T++;
+            }
         }
-        a = 0;
-        c = 0;
-        g = 0;
-        t = 0;
-        for(int i = S - P; i < S; i++){
-            if(DNA.charAt(i) == 'A') a++;
-            else if(DNA.charAt(i) == 'C') c++;
-            else if(DNA.charAt(i) == 'G') g++;
-            else if(DNA.charAt(i) == 'T') t++;
+
+        int answer = 0;
+
+        while (right <= S) {
+
+            if (check(A, C, G, T, map)) {
+                answer++;
+            }
+
+            if (s.charAt(left) == 'A') {
+                A--;
+            }
+
+            if (s.charAt(left) == 'C') {
+                C--;
+            }
+
+            if (s.charAt(left) == 'G') {
+                G--;
+            }
+
+            if (s.charAt(left) == 'T') {
+                T--;
+            }
+
+            left++;
+            right++;
+
+            if (right == S) break;
+
+            if (s.charAt(right) == 'A') {
+                A++;
+            }
+
+            if (s.charAt(right) == 'C') {
+                C++;
+            }
+
+            if (s.charAt(right) == 'G') {
+                G++;
+            }
+
+            if (s.charAt(right) == 'T') {
+                T++;
+            }
         }
-        if(a >= A && c >= C && g >= G && t >= T) cnt++;
-        System.out.println(cnt);
+
+        System.out.println(answer);
+    }
+
+    static boolean check(int A, int C, int G, int T, HashMap<Character, Integer> map) {
+        if (A < map.get('A')) {
+            return false;
+        }
+
+        if (C < map.get('C')) {
+            return false;
+        }
+
+        if (G < map.get('G')) {
+            return false;
+        }
+
+        if (T < map.get('T')) {
+            return false;
+        }
+
+        return true;
     }
 }
