@@ -1,45 +1,54 @@
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.StringTokenizer;
+
 public class Main {
-    public static void main(String[] args) throws IOException{
+    public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+        StringTokenizer st;
 
         int T = Integer.parseInt(br.readLine());
-        String s;
-        StringBuilder result = new StringBuilder();
-        for(int t = 0; t < T; t++){
-            int cnt = 0;
-            int N = Integer.parseInt(br.readLine());
-            int[] grade = new int[N+1];
 
-            for(int i = 0; i < N; i++) {
-                StringTokenizer st = new StringTokenizer(br.readLine());
-                int a = Integer.parseInt(st.nextToken());
-                int b = Integer.parseInt(st.nextToken());
-                grade[a] = b;
+        for (int tc = 0; tc < T; tc++) {
+            int N = Integer.parseInt(br.readLine());
+
+            ArrayList<Employee> employees = new ArrayList<>();
+
+            for (int i = 0; i < N; i++) {
+                st = new StringTokenizer(br.readLine());
+                int doc = Integer.parseInt(st.nextToken());
+                int inter = Integer.parseInt(st.nextToken());
+
+                employees.add(new Employee(doc, inter));
             }
-            int k = grade[1];
-            for(int i = 1; i <= N; i++){
-                if(grade[i] > k){
-                    cnt++;
-                }
-                if(grade[i] < k){
-                    k = grade[i];
+
+            int answer = N;
+            Collections.sort(employees, (a, b) -> a.doc - b.doc);
+            int max = employees.get(0).inter;
+            for (int i = 1; i < N; i++) {
+                Employee now = employees.get(i);
+
+                if (max < now.inter) {
+                    answer--;
+                } else {
+                    max = now.inter;
                 }
             }
-            result.append((N-cnt)+"\n");
+
+            System.out.println(answer);
         }
-        bw.write(result.toString());
-        bw.close();
-        br.close();
+    }
+
+    static class Employee {
+        int doc;
+        int inter;
+
+        Employee(int doc, int inter) {
+            this.doc = doc;
+            this.inter = inter;
+        }
     }
 }
-
-//1   4
-//2   5     O
-//3   6     O
-//4   2
-//5   7     O
-//6   1
-//7   3     O
