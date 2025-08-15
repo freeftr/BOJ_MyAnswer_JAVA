@@ -3,38 +3,43 @@ import java.util.*;
 
 class Solution {
     public int solution(String str1, String str2) {
-        str1 = str1.toLowerCase();
-        str2 = str2.toLowerCase();
+        str1 = str1.toUpperCase();
+        str2 = str2.toUpperCase();
 
-        List<String> list1 = new ArrayList<>();
-        List<String> list2 = new ArrayList<>();
+        ArrayList<String> list1 = new ArrayList<>();
+        ArrayList<String> list2 = new ArrayList<>();
 
-        // 유효한 두 글자만 리스트에 저장
         for (int i = 0; i < str1.length() - 1; i++) {
-            String s = str1.substring(i, i + 2);
-            if (s.matches("[a-z]{2}")) {
-                list1.add(s);
+            char a = str1.charAt(i);
+            char b = str1.charAt(i + 1);
+            if (a >= 'A' && a <= 'Z' && b >= 'A' && b <= 'Z') {
+                list1.add(a + "" + b);
+            }
+        }
+        for (int i = 0; i < str2.length() - 1; i++) {
+            char a = str2.charAt(i);
+            char b = str2.charAt(i + 1);
+            if (a >= 'A' && a <= 'Z' && b >= 'A' && b <= 'Z') {
+                list2.add(a + "" + b);
             }
         }
 
-        for (int i = 0; i < str2.length() - 1; i++) {
-            String s = str2.substring(i, i + 2);
-            if (s.matches("[a-z]{2}")) {
-                list2.add(s);
-            }
-        }
+        int A = list1.size();
+        int B = list2.size();
+        if (A == 0 && B == 0) return 65536;
 
         int same = 0;
-        List<String> temp = new ArrayList<>(list2);
+        ArrayList<String> list2Copy = new ArrayList<>(list2);
         for (String s : list1) {
-            if (temp.contains(s)) {
+            int idx = list2Copy.indexOf(s);
+            if (idx != -1) {
                 same++;
-                temp.remove(s); // 다중집합: 하나만 제거
+                list2Copy.remove(idx);
             }
         }
 
-        int union = list1.size() + list2.size() - same;
-        int answer = (int)((union == 0 ? 1.0 : (double) same / union) * 65536);
-        return answer;
+        int union = A + B - same;
+        double score = (double) same * 65536.0 / union;
+        return (int) Math.floor(score);
     }
 }
