@@ -1,41 +1,36 @@
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Stack;
 
 public class Main {
-	public static void main(String[] args) {
-		StringBuilder sb = new StringBuilder();
-		Scanner sc = new Scanner(System.in);
-		int N = sc.nextInt();
-		boolean check = true;
-		int index = 0;
-		Stack<Integer> stackInt = new Stack<>();
-		
-		for(int i = 0; i < N; i++) {
-			if(stackInt.empty()) {
-				stackInt.push(0);
-			}
-			int k = sc.nextInt();
-			if(stackInt.peek() < k) {
-				while(stackInt.peek() < k) {
-					index++;
-					stackInt.push(index);
-					sb.append("+\n");
-				}
-			}
-			if(stackInt.peek() == k) {
-				stackInt.pop();
-				sb.append("-\n");
-				
-			}
-			if(stackInt.peek() > k) {
-				check = false;
-			}
-		}
-		String result = sb.toString();
-		if(!check) {
-			System.out.println("NO");
-		}
-		else {
-			System.out.println(result);
-		}
-	}
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringBuilder sb = new StringBuilder();
+
+        int n = Integer.parseInt(br.readLine());
+        Stack<Integer> stack = new Stack<>();
+
+        int idx = 1;
+        for (int i = 0; i < n; i++) {
+            int a = Integer.parseInt(br.readLine());
+
+            if (stack.isEmpty()) {
+                stack.push(idx++);
+                sb.append("+\n");
+            }
+
+            while (stack.peek() != a && idx <= a) {
+                stack.push(idx++);
+                sb.append("+\n");
+            }
+
+            if (stack.peek() == a) {
+                stack.pop();
+                sb.append("-\n");
+            }
+        }
+
+        System.out.println(stack.isEmpty() ? sb.toString() : "NO");
+    }
 }
