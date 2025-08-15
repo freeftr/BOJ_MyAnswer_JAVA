@@ -1,26 +1,31 @@
 import java.io.*;
-import java.util.*;
-public class Main {
+import java.util.StringTokenizer;
 
-	public static void main(String[] args) throws IOException {
-		Scanner sc = new Scanner(System.in);
-		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-		long A = sc.nextLong();
-		long B = sc.nextLong();
-		long n = 0;
-		if(A < B) {
-			long temp = B;
-			B = A;
-			A = temp;
-		}
-		while(B!=0) {
-			n = A % B;
-			A = B;
-			B = n;
-		}
-		for(long i = 0; i < A; i++) {
-			bw.write('1');
-		}
-		bw.close();
-	}
+public class Main {
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+        StringTokenizer st = new StringTokenizer(br.readLine());
+
+        long A = Long.parseLong(st.nextToken());
+        long B = Long.parseLong(st.nextToken());
+
+        long min = Math.min(A, B);
+        long max = Math.max(A, B);
+
+        StringBuilder sb = new StringBuilder();
+
+        for (int i = 0; i < gcd(min, max); i++) {
+            sb.append("1");
+        }
+
+        System.out.println(sb.toString());
+    }
+
+    static long gcd(long a, long b) {
+        if (b==0) {
+            return a;
+        }
+        return gcd(b, a % b);
+    }
 }
