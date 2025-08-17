@@ -1,32 +1,36 @@
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 public class Main {
-    public static void main(String[] args) throws Exception{
+    public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         int N = Integer.parseInt(br.readLine());
-        int result = 0, sum = 0;
-        int lidx = 0, ridx = 0;
-        if(N == 1){
+
+        if (N == 1) {
             System.out.println(1);
+            return;
         }
-        else {
-            while (lidx <= N && ridx <= N) {
-                ridx++;
-                lidx = ridx;
-                sum = 0;
-                while (lidx >= 0) {
-                    lidx--;
-                    sum = (lidx + ridx) * (ridx - lidx + 1) / 2;
-                    if (sum > N) {
-                        break;
-                    }
-                    if (sum == N) {
-                        result++;
-                        break;
-                    }
-                }
+
+        int left = 1;
+        int right = 2;
+        int sum = left + right;
+        int answer = 0;
+
+        while (right <= N) {
+            if (sum < N) {
+                right++;
+                sum += right;
+            } else if (sum == N) {
+                answer++;
+                sum -= left;
+                left++;
+            } else {
+                sum -= left;
+                left++;
             }
-            System.out.println(result + 1);
         }
+
+        System.out.println(answer);
     }
 }
