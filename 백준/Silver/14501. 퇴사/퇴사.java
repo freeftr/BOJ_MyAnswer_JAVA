@@ -1,29 +1,33 @@
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.StringTokenizer;
+
 public class Main {
-    public static void main(String[] args) throws IOException{
+    public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+        StringTokenizer st;
+
         int N = Integer.parseInt(br.readLine());
-        int[] T = new int[100];
-        int[] P = new int[100];
-        for(int i = 1; i <= N; i++) {
-            StringTokenizer st = new StringTokenizer(br.readLine());
-            T[i] = Integer.parseInt(st.nextToken());
-            P[i] = Integer.parseInt(st.nextToken());
+        int[][] jobs = new int[N][2];
+
+        for (int i = 0; i < N; i++) {
+            st = new StringTokenizer(br.readLine());
+            jobs[i][0] = Integer.parseInt(st.nextToken());
+            jobs[i][1] = Integer.parseInt(st.nextToken());
         }
-        int[] dp = new int[100];
-        if(T[N]==1){
-            dp[N] = P[N];
-        }
-        for(int i = N; i>=1; i--){
-            if(N-i+1<T[i]){
-                dp[i] = dp[i+1];
+
+        int[] dp = new int[N + 1];
+
+        for (int i = 0; i < N; i++) {
+            dp[i + 1] = Math.max(dp[i + 1], dp[i]);
+
+            int end = i + jobs[i][0];
+            if (end <= N) {
+                dp[end] = Math.max(dp[end], dp[i] + jobs[i][1]);
             }
-            else{
-                dp[i]=Math.max(dp[i+T[i]]+P[i], dp[i+1]);
-            }
         }
-        System.out.println(dp[1]);
+
+        System.out.println(dp[N]);
     }
 }
