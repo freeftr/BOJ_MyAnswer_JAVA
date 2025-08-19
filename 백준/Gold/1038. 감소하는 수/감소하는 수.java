@@ -2,32 +2,29 @@ import java.io.*;
 import java.util.*;
 
 public class Main {
-    static long N;
-    static long cnt = 0;
-    public static void main(String[] args) throws IOException {
+
+    static List<Long> list = new ArrayList<>();
+
+    public static void main(String[] args) throws Exception {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        N = Integer.parseInt(br.readLine());
-        if(N==0){
-            System.out.println(0);
-            System.exit(0);
+        int N = Integer.parseInt(br.readLine());
+
+        for (int d = 0; d <= 9; d++) {
+            dfs(d, d);
         }
-        System.out.println(bfs());
+
+        Collections.sort(list);
+        if (N >= list.size()) {
+            System.out.println(-1);
+        } else {
+            System.out.println(list.get(N));
+        }
     }
-    public static long bfs(){
-        Queue<Long> q = new LinkedList<>();
-        for(long i = 1; i<=9; i++){
-            q.add(i);
+
+    static void dfs(int last, long num) {
+        list.add(num);
+        for (int next = 0; next < last; next++) {
+            dfs(next, num * 10 + next);
         }
-        while(!q.isEmpty()){
-            cnt++;
-            long v = q.poll();
-            if(cnt==N){
-                return v;
-            }
-            for(long i = 0; i < v%10; i++){
-                q.add(v*10+i);
-            }
-        }
-        return -1;
     }
 }
