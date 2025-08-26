@@ -1,43 +1,32 @@
-import java.io.*;
-import java.util.*;
-
 class Solution {
     public int solution(int[] stones, int k) {
         int answer = 0;
-        answer = bs(stones, k);
-        return answer;
-    }
-    
-    static int bs(int[] stones, int k){
-        int low = 0;
-        int high = 200000000;
         
-        while(low<=high){
-            int mid = (low+high)/2;
+        int left = 0;
+        int right = 200000000;
+        
+        while (left < right) {
+            int mid = (left + right) / 2;
             
-            if (across(stones, mid, k)){
-                low = mid+1;
-            } else{
-                high = mid-1;
+            if (check(mid, stones, k)) {
+                left = mid + 1;
+            } else {
+                right = mid;
             }
         }
-        
-        return high;
+        return right;
     }
     
-    static boolean across(int[] stones, int mid, int k){
+    static boolean check(int target, int[] stones, int k) {
         int cnt = 0;
-        
-        for (int stone : stones){
-            if (stone - mid < 0){
+        for (int i = 0; i < stones.length; i++) {
+            if (stones[i] - target <= 0) {
                 cnt++;
             } else {
                 cnt = 0;
             }
             
-            if(cnt==k){
-                return false;
-            }
+            if (cnt == k) return false;
         }
         return true;
     }
