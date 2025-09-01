@@ -36,14 +36,3 @@ public class Main {
         System.out.println(answer * answer);
     }
 }
-
-/*
-0100
-0111
-1110
-0010
-
-0000
-0111
-012
- */
