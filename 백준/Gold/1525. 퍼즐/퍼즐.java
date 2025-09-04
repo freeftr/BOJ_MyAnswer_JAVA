@@ -1,69 +1,72 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.HashSet;
+import java.util.Queue;
 
 public class Main {
 
-	static String answer = "123456780";
+    static HashSet<String> set = new HashSet<>();
+    static int[] dx = {0,0,1,-1};
+    static int[] dy = {1,-1,0,0};
 
-	public static void main(String[] args) throws IOException {
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringBuilder sb = new StringBuilder();
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringBuilder sb = new StringBuilder();
 
-		for (int i = 0; i < 3; i++) {
-			StringTokenizer st = new StringTokenizer(br.readLine());
-			for (int j = 0; j < 3; j++) {
-				sb.append(st.nextToken());
-			}
-		}
+        for (int i = 0; i < 3; i++) {
+            String s = br.readLine().replace(" ", "");
+            sb.append(s);
+        }
 
-		String start = sb.toString();
-		System.out.println(bfs(start));
-	}
+        System.out.println(bfs(sb.toString()));
+    }
 
-	static int bfs(String start) {
-		Queue<String> q = new LinkedList<>();
-		Map<String, Integer> visited = new HashMap<>();
+    static int bfs(String s) {
+        final String GOAL = "123456780";
 
-		q.add(start);
-		visited.put(start, 0);
+        if (s.equals(GOAL)) return 0;
 
-		int[] dx = {-1, 1, -3, 3};
+        set.clear();
+        Queue<String> q = new ArrayDeque<>();
+        q.add(s);
+        set.add(s);
 
-		while (!q.isEmpty()) {
-			String cur = q.poll();
+        int depth = 0;
 
-			if (cur.equals(answer)) {
-				return visited.get(cur);
-			}
+        while (!q.isEmpty()) {
+            int size = q.size();
+            for (int k = 0; k < size; k++) {
+                String cur = q.poll();
+                if (cur.equals(GOAL)) return depth;
 
-			int zeroIdx = cur.indexOf('0');
-			int x = zeroIdx / 3;
-			int y = zeroIdx % 3;
+                int idx = cur.indexOf('0');
+                int x = idx / 3;
+                int y = idx % 3;
 
-			for (int i = 0; i < 4; i++) {
-				int nextIdx = zeroIdx + dx[i];
+                for (int i = 0; i < 4; i++) {
+                    int nx = x + dx[i];
+                    int ny = y + dy[i];
+                    if (nx < 0 || ny < 0 || nx >= 3 || ny >= 3) continue;
 
-				if (nextIdx < 0 || nextIdx >= 9) continue;
-				if (i == 0 && y == 0) continue;
-				if (i == 1 && y == 2) continue;
-				if (i == 2 && x == 0) continue;
-				if (i == 3 && x == 2) continue;
+                    int nIdx = nx * 3 + ny;
 
-				char[] arr = cur.toCharArray(); 
-				char temp = arr[zeroIdx];
-				arr[zeroIdx] = arr[nextIdx];
-				arr[nextIdx] = temp;
+                    char[] arr = cur.toCharArray();
+                    char tmp = arr[idx];
+                    arr[idx] = arr[nIdx];
+                    arr[nIdx] = tmp;
 
-				String next = new String(arr); 
-				if (!visited.containsKey(next)) {
-					visited.put(next, visited.get(cur) + 1);
-					q.add(next);
-				}
-			}
-		}
+                    String next = new String(arr);
+                    if (set.contains(next)) continue;
 
-		return -1;
-	}
+                    set.add(next);
+                    q.add(next);
+                }
+            }
+            depth++;
+        }
+
+        return -1;
+    }
 }
