@@ -1,45 +1,71 @@
-import java.io.*;
 import java.util.*;
 
 class Solution {
     public int solution(String str1, String str2) {
-        str1 = str1.toUpperCase();
-        str2 = str2.toUpperCase();
-
+        int answer = 0;
         ArrayList<String> list1 = new ArrayList<>();
         ArrayList<String> list2 = new ArrayList<>();
-
+        ArrayList<String> same = new ArrayList<>();
+        ArrayList<String> all = new ArrayList<>();
+        
         for (int i = 0; i < str1.length() - 1; i++) {
-            char a = str1.charAt(i);
-            char b = str1.charAt(i + 1);
-            if (a >= 'A' && a <= 'Z' && b >= 'A' && b <= 'Z') {
-                list1.add(a + "" + b);
+            String s = str1.substring(i, i + 2).toLowerCase();
+            if ('a' <= s.charAt(0) && s.charAt(0) <= 'z' && 'a' <= s.charAt(1) && s.charAt(1) <= 'z') {
+                list1.add(s);
             }
         }
+        
         for (int i = 0; i < str2.length() - 1; i++) {
-            char a = str2.charAt(i);
-            char b = str2.charAt(i + 1);
-            if (a >= 'A' && a <= 'Z' && b >= 'A' && b <= 'Z') {
-                list2.add(a + "" + b);
+            String s = str2.substring(i, i + 2).toLowerCase();
+            if ('a' <= s.charAt(0) && s.charAt(0) <= 'z' && 'a' <= s.charAt(1) && s.charAt(1) <= 'z') {
+                list2.add(s);
             }
         }
-
-        int A = list1.size();
-        int B = list2.size();
-        if (A == 0 && B == 0) return 65536;
-
-        int same = 0;
-        ArrayList<String> list2Copy = new ArrayList<>(list2);
-        for (String s : list1) {
-            int idx = list2Copy.indexOf(s);
-            if (idx != -1) {
-                same++;
-                list2Copy.remove(idx);
-            }
+        
+        if (list1.isEmpty() && list2.isEmpty()) {
+            return 65536;
         }
 
-        int union = A + B - same;
-        double score = (double) same * 65536.0 / union;
-        return (int) Math.floor(score);
+        Collections.sort(list1);
+        Collections.sort(list2);
+        
+        int one = 0;
+        int two = 0;
+        
+        int gyo = 0;
+        
+        int i = 0, j = 0;
+        while (i < list1.size() && j < list2.size()) {
+            int cmp = list1.get(i).compareTo(list2.get(j));
+            if (cmp == 0) {
+                gyo++;
+                i++;
+                j++;
+            } else if (cmp < 0) {
+                i++;
+            } else {
+                j++;
+            }
+        }
+        
+        int hap = list1.size() + list2.size() - gyo;
+    
+        if (hap == 0) {
+            return 65536;
+        }
+        
+        answer = (int) gyo * 65536 / hap;
+        return answer;
     }
 }
+
+/*
+자카드 유사도 = 교집합 크기 / 합집합 크기
+둘다 공집합 이면 1
+
+1 1 2 2 3
+1 2 2 4 5
+1 1 2 3 4 5
+aa aa
+aa aa aa
+*/
