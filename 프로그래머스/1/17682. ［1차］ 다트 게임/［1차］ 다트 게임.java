@@ -2,37 +2,56 @@ import java.util.*;
 
 class Solution {
     public int solution(String dartResult) {
-        int[] scores = new int[3];
+        int answer = 0;
+        StringBuilder sb = new StringBuilder();
+        int[] nums = new int[3];
         int idx = 0;
-        int i = 0, n = dartResult.length();
-
-        while (i < n) {
-            int num = 0;
-            while (i < n && Character.isDigit(dartResult.charAt(i))) {
-                num = num * 10 + (dartResult.charAt(i) - '0');
-                i++;
-            }
-
-            char bonus = dartResult.charAt(i++);
-            if (bonus == 'S') num = (int) Math.pow(num, 1);
-            else if (bonus == 'D') num = (int) Math.pow(num, 2);
-            else if (bonus == 'T') num = (int) Math.pow(num, 3);
-
-            if (i < n) {
-                char op = dartResult.charAt(i);
-                if (op == '*') {
-                    num *= 2;
-                    if (idx > 0) scores[idx - 1] *= 2;
-                    i++;
-                } else if (op == '#') {
-                    num *= -1;
-                    i++;
+        
+        for (int i = 0; i < dartResult.length(); i++) {
+            if ('S' == dartResult.charAt(i) || dartResult.charAt(i) == 'D' || dartResult.charAt(i) == 'T') {
+                String temp = dartResult.charAt(i - 1) + "";
+                for (int j = i - 2; j >= 0; j++) {
+                    if ('0' <= dartResult.charAt(j) && dartResult.charAt(j) <= '9') {
+                        temp = dartResult.charAt(j) + temp;
+                    } else {
+                        break;
+                    }
                 }
+                int base = Integer.parseInt(temp);
+                String type = dartResult.charAt(i) + "";
+                String prize = "";
+                
+                if (i != dartResult.length() - 1 && (dartResult.charAt(i + 1) == '*' || dartResult.charAt(i + 1) == '#')) {
+                    prize = dartResult.charAt(i + 1) + "";
+                }
+                
+                if (type.equals("D")) {
+                    base = (int) Math.pow(base, 2);
+                }
+                
+                if (type.equals("T")) {
+                    base = (int) Math.pow(base, 3);
+                }
+                
+                if (prize.equals("*")) {
+                    if (idx != 0) {
+                        nums[idx - 1] *= 2;
+                    } 
+                    base *= 2;
+                }
+                
+                if (prize.equals("#")) {
+                    base *= -1;
+                }
+                
+                nums[idx] = base;
+                idx++;
             }
-
-            scores[idx++] = num;
         }
-
-        return scores[0] + scores[1] + scores[2];
+        
+        for (int num : nums) {
+            answer += num;
+        }
+        return answer;
     }
 }
