@@ -1,23 +1,27 @@
 class Solution {
     public String solution(int n, int t, int m, int p) {
         String answer = "";
-        int number = 0;
-        int cnt = 0;
-        StringBuilder sb = new StringBuilder();
-        
-        while (cnt != m * t) {
-            sb.append(Integer.toString(number++, n));
-            cnt++;
-        }
-        
-        String s = sb.toString();
-        for (int i = p - 1; i < s.length(); i+=m) {
-            answer += s.charAt(i);
-            if (answer.length() == t) {
+        String s = "";
+        int idx = 0;
+        while (true) {
+            String a = Integer.toString(idx++, n);
+            s += a;
+            if (s.length() > t * m) {
                 break;
             }
         }
+        s = s.substring(0, t * m);
+        s = s.toUpperCase();
+        System.out.println(s);
         
-        return answer.toUpperCase();
+        if (m == p) p = 0;
+        
+        for (int i = 0; i < s.length(); i++) {
+            if ((i + 1) % m == p) {
+                answer += s.charAt(i) + "";
+            }
+        }
+        
+        return answer;
     }
 }
