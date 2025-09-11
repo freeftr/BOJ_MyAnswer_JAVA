@@ -1,34 +1,42 @@
-import java.util.*;
-
 class Solution {
     public String[] solution(int n, int[] arr1, int[] arr2) {
         String[] answer = new String[n];
         String[] s1 = new String[n];
         String[] s2 = new String[n];
         
-        for (int a = 0; a < n; a++) {
-            String t1 = Integer.toBinaryString(arr1[a]);
-            String t2 = Integer.toBinaryString(arr2[a]);
-            
-            while (t1.length() < n) t1 = "0" + t1;
-            while (t2.length() < n) t2 = "0" + t2;
-            
-            s1[a] = t1;
-            s2[a] = t2;
-        }
-        
         for (int i = 0; i < n; i++) {
-            StringBuilder sb = new StringBuilder();
-            for (int j = 0; j < n; j++) {
-                if (s1[i].charAt(j) == '1' || s2[i].charAt(j) == '1') {
-                    sb.append("#");
-                } else {
-                    sb.append(" ");
+            s1[i] = Integer.toBinaryString(arr1[i]);
+            s2[i] = Integer.toBinaryString(arr2[i]);
+            int len1 = s1[i].length();
+            int len2 = s2[i].length();
+            if (s1[i].length() < n) {
+                for (int j = 0; j < n - len1; j++) {
+                    s1[i] = "0" + s1[i];
                 }
             }
-            answer[i] = sb.toString();
+            if (s2[i].length() < n) {
+                for (int j = 0; j < n - len2; j++) {
+                    s2[i] = "0" + s2[i];
+                }
+            }
+            String s = "";
+            for (int j = 0; j < n; j++) {
+                if (s1[i].charAt(j) == '1' || s2[i].charAt(j) == '1') {
+                    s += "#";
+                } else {
+                    s += " ";
+                }
+            }
+            
+            answer[i] = s;
         }
-        
         return answer;
     }
 }
+
+/*
+n * n
+" ", # = 벽
+
+모두 공백만 공백
+*/
