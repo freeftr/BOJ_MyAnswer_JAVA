@@ -1,38 +1,35 @@
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.StringTokenizer;
 
 public class Main {
-    static int TC, N, M, W;
 
-    static class Edge {
-        int from, to, cost;
-        Edge(int from, int to, int cost) {
-            this.from = from;
-            this.to = to;
-            this.cost = cost;
-        }
-    }
+    static int N, M, W;
+    static ArrayList<Edge> edges = new ArrayList<>();
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st;
 
-        TC = Integer.parseInt(br.readLine());
-        for (int tc = 0; tc < TC; tc++) {
+        int tc = Integer.parseInt(br.readLine());
 
+        for (int t = 0; t < tc; t++) {
             st = new StringTokenizer(br.readLine());
             N = Integer.parseInt(st.nextToken());
             M = Integer.parseInt(st.nextToken());
             W = Integer.parseInt(st.nextToken());
-
-            List<Edge> edges = new ArrayList<>();
-            List<Integer> wormholes = new ArrayList<>();
+            
+            edges.clear();
 
             for (int i = 0; i < M; i++) {
                 st = new StringTokenizer(br.readLine());
                 int S = Integer.parseInt(st.nextToken());
                 int E = Integer.parseInt(st.nextToken());
                 int T = Integer.parseInt(st.nextToken());
+
                 edges.add(new Edge(S, E, T));
                 edges.add(new Edge(E, S, T));
             }
@@ -42,45 +39,48 @@ public class Main {
                 int S = Integer.parseInt(st.nextToken());
                 int E = Integer.parseInt(st.nextToken());
                 int T = Integer.parseInt(st.nextToken());
-                edges.add(new Edge(S, E, -T));
-                wormholes.add(S);
+
+                edges.add(new Edge(S, E, T * -1));
             }
 
-            boolean hasNegativeCycle = false;
-            for (int start : wormholes) {
-                if (bellmanFord(start, N, edges)) {
-                    hasNegativeCycle = true;
-                    break;
+            int[] dist = new int[N + 1];
+            Arrays.fill(dist, 0);
+
+            boolean negative = false;
+            for (int i = 1; i <= N; i++) {
+                for (int j = 0; j < edges.size(); j++) {
+                    Edge edge = edges.get(j);
+
+                    if (dist[edge.e] > dist[edge.s] + edge.t) {
+                        dist[edge.e] = dist[edge.s] + edge.t;
+                        if (i == N) {
+                            negative = true;
+                            break;
+                        }
+                    }
                 }
+                if (negative) break;
             }
 
-            if (hasNegativeCycle) {
-                System.out.println("YES");
-            } else {
-                System.out.println("NO");
-            }
+            System.out.println(negative ? "YES" : "NO");
         }
     }
 
-    public static boolean bellmanFord(int start, int n, List<Edge> edges) {
-        int[] dist = new int[n + 1];
-        Arrays.fill(dist, Integer.MAX_VALUE);
-        dist[start] = 0;
+    static class Edge {
+        int s;
+        int e;
+        int t;
 
-        for (int i = 1; i < n; i++) {
-            for (Edge edge : edges) {
-                if (dist[edge.from] != Integer.MAX_VALUE && dist[edge.from] + edge.cost < dist[edge.to]) {
-                    dist[edge.to] = dist[edge.from] + edge.cost;
-                }
-            }
+        Edge(int s, int e, int t) {
+            this.s = s;
+            this.e = e;
+            this.t = t;
         }
-
-        for (Edge edge : edges) {
-            if (dist[edge.from] != Integer.MAX_VALUE && dist[edge.from] + edge.cost < dist[edge.to]) {
-                return true;
-            }
-        }
-
-        return false;
     }
 }
+
+/*
+N개의 지점
+M개의 도로
+W 웜홀 => 음의 간선
+*/
