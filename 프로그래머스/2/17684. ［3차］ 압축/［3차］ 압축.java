@@ -1,41 +1,37 @@
 import java.util.*;
+
 class Solution {
     public int[] solution(String msg) {
-        int[] answer = {};
-        ArrayList<String> alpha = new ArrayList<>();
         ArrayList<Integer> result = new ArrayList<>();
+        ArrayList<String> dict = new ArrayList<>();
+        
         for (int i = 0; i < 26; i++) {
-            alpha.add((char)('A' + i) + "");
+            dict.add("" + (char)('A' + i));
         }
         
-        for (int i = 0; i < msg.length(); i++) {
-            String temp = msg.charAt(i) + "";
-            String w = temp;
-            String c = "";
-
-            for (int j = i + 1; j < msg.length(); j++) {
-                temp += msg.charAt(j);
-                if (!alpha.contains(temp)) {
-                    break;
-                } else {
-                    w = temp;
-                }
-            }
-            c = temp;
-            result.add(alpha.indexOf(w) + 1);
-            alpha.add(c);
+        int i = 0;
+        while (i < msg.length()) {
+            String w = msg.charAt(i) + "";
+            int idx = i;
             
-            // System.out.println(i + " " + w + " " + c + " " + (alpha.indexOf(w) + 1));
-            if (w.length() > 1) {
-                i += w.length() - 1;
+            while (idx + 1 < msg.length() && dict.contains(w + msg.charAt(idx + 1))) {
+                w += msg.charAt(++idx);
             }
+            
+            result.add(dict.indexOf(w) + 1);
+            
+            if (idx + 1 < msg.length()) {
+                dict.add(w + msg.charAt(idx + 1));
+            }
+            
+            i = idx + 1;
         }
         
-        answer = new int[result.size()];
-        
-        for (int i = 0; i < result.size(); i++) {
-            answer[i] = result.get(i);
+        int[] answer = new int[result.size()];
+        for (int j = 0; j < result.size(); j++) {
+            answer[j] = result.get(j);
         }
+        
         return answer;
     }
 }
