@@ -1,36 +1,30 @@
 import java.util.*;
-
 class Solution {
     public String solution(String[] survey, int[] choices) {
         String answer = "";
-        int size = survey.length;
-        int[] score = {-1, 3, 2, 1, 0, 1, 2, 3};
+        int[] score = {0, 3, 2, 1, 0, 1, 2, 3};
         HashMap<String, Integer> map = new HashMap<>();
-        map.put("R", 0);
-        map.put("T", 0);
         
-        map.put("C", 0);
-        map.put("F", 0);
-       
-        map.put("J", 0);
-        map.put("M", 0);
-        
-        map.put("A", 0);
-        map.put("N", 0);
-        
-        for (int i = 0; i < size; i++) {
-            String left = survey[i].charAt(0) + "";
-            String right = survey[i].charAt(1) + "";
+        for (int i = 0; i < choices.length; i++) {
+            String type = survey[i];
+            String one = type.split("")[0];
+            String two = type.split("")[1];
             
             if (choices[i] < 4) {
-                map.put(left, map.get(left) + score[choices[i]]);
-            } else if (choices[i] > 4) {
-                map.put(right, map.get(right) + score[choices[i]]);
+                map.merge(one, score[choices[i]], (a, b) -> a + b);   
+            }
+            if (choices[i] > 4) { 
+                map.merge(two, score[choices[i]], (a, b) -> a + b);   
             }
         }
-        
-        int R = map.get("R");
-        int T = map.get("T");
+        int R = map.getOrDefault("R", 0);
+        int T = map.getOrDefault("T", 0);
+        int C = map.getOrDefault("C", 0);
+        int F = map.getOrDefault("F", 0);
+        int J = map.getOrDefault("J", 0);
+        int M = map.getOrDefault("M", 0);
+        int A = map.getOrDefault("A", 0);
+        int N = map.getOrDefault("N", 0);
         
         if (R >= T) {
             answer += "R";
@@ -38,17 +32,11 @@ class Solution {
             answer += "T";
         }
         
-        int C = map.get("C");
-        int F = map.get("F");
-        
         if (C >= F) {
             answer += "C";
         } else {
             answer += "F";
         }
-        
-        int J = map.get("J");
-        int M = map.get("M");
         
         if (J >= M) {
             answer += "J";
@@ -56,24 +44,22 @@ class Solution {
             answer += "M";
         }
         
-        int A = map.get("A");
-        int N = map.get("N");
-        
         if (A >= N) {
             answer += "A";
         } else {
             answer += "N";
         }
+        
         return answer;
     }
 }
 
 /*
-1 - R,T
-2 - C,F
-3 - J,M
-4 - A,N
-
+1 -> R, T
+2 -> C, F
+3 -> J, M
+4 -> A, N
+n개의 질문
 3 2 1 0 1 2 3
-점수 같으면 사전 순
+각 지표에서 높은 점수 선택, 같으면 사전순
 */
