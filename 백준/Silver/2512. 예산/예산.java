@@ -1,45 +1,61 @@
-import java.util.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Map;
+import java.util.StringTokenizer;
+
 public class Main {
-    static int ans = 0;
-    static int sum = 0;
-    static int max = 0;
-    static int N;
-    static long M;
-    static long[] province;
-    public static void main(String[] args) throws IOException{
+    public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-        StringTokenizer st = new StringTokenizer(br.readLine());
-        N = Integer.parseInt(st.nextToken());
-        province = new long[N];
+        StringTokenizer st;
+
+        int N = Integer.parseInt(br.readLine());
+        int[] arr = new int[N];
+
         st = new StringTokenizer(br.readLine());
-        for(int i = 0; i < N; i++) {
-            province[i] = Integer.parseInt(st.nextToken());
+        for (int i = 0; i < N; i++) {
+            arr[i] = Integer.parseInt(st.nextToken());
         }
-        M = Long.parseLong(br.readLine());
-        Arrays.sort(province);
-        long low = 0;
-        long high = province[N-1];
-        long mid = 0;
-        while(low<=high){
-            mid = (low+high)/2;
-            long sum = 0;
-            for(int i = 0; i < N; i++){
-                if(province[i]>mid){
-                    sum+=mid;
-                }
-                else{
-                    sum+=province[i];
-                }
-            }
-            if(sum<=M) {
-                low = mid + 1;
-            }
-            else{
-                high = mid-1;
+
+        int M = Integer.parseInt(br.readLine());
+
+        int left = 0;
+        int right = M;
+
+        while (left <= right) {
+            int mid = (left + right) / 2;
+
+            if (check(mid, arr, M)) {
+                left = mid + 1;
+            } else {
+                right = mid - 1;
             }
         }
-        System.out.println(high);
+
+        int answer = 0;
+        for (int i : arr) {
+            if (i >= right) {
+                answer = right;
+                break;
+            } else {
+                answer = Math.max(answer, i);
+            }
+        }
+
+        System.out.println(answer);
+    }
+
+    static boolean check(int mid, int[] arr, int M) {
+        int sum = 0;
+        for (int i : arr) {
+            sum += i < mid ? i : mid;
+        }
+
+        return sum <= M;
     }
 }
+/*
+예산을 분배
+- 모든 요청에 배정 가능 => 그대로 배정
+- 배정될 수 없는 경우 => 상한액 정해놓고 이하인 것들만 처리
+ */
