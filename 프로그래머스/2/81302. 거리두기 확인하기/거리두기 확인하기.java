@@ -1,69 +1,52 @@
 import java.util.*;
 
 class Solution {
-    
-    static int[] dx = {0,0,1,-1};
-    static int[] dy = {1,-1,0,0};
-    
+    static int[] dx = {1, 0, -1, 0};
+    static int[] dy = {0, 1, 0, -1};
+
     public int[] solution(String[][] places) {
         int[] answer = new int[places.length];
-        int idx = 0;
-        for (String[] place : places) {
-            boolean flag = false;
-            for (int i = 0; i < 5; i++) {
-                for (int j = 0; j < 5; j++) {
-                    if (place[i].charAt(j) == 'P') {
-                        if (!bfs(i, j, place)) {
-                            flag = true;
-                            break;
-                        }
+
+        for (int i = 0; i < places.length; i++) {
+            String[] map = places[i];
+            boolean ok = true;
+
+            for (int a = 0; a < 5 && ok; a++) {
+                for (int b = 0; b < 5 && ok; b++) {
+                    if (map[a].charAt(b) == 'P') {
+                        if (!bfs(a, b, map)) ok = false;
                     }
                 }
-                if (flag) {
-                    break;
-                }
             }
-            
-            if (!flag) {
-                answer[idx] = 1;
-            }
-            
-            idx++;
+            answer[i] = ok ? 1 : 0;
         }
         return answer;
     }
-    
-    static boolean bfs(int a, int b, String[] place) {
-        Queue<int[]> q = new ArrayDeque<>();
+
+    static boolean bfs(int a, int b, String[] map) {
         boolean[][] visited = new boolean[5][5];
-        
-        q.add(new int[]{a, b, 0});
+        ArrayDeque<int[]> q = new ArrayDeque<>();
         visited[a][b] = true;
-        
+        q.add(new int[]{a, b});
+
         while (!q.isEmpty()) {
             int[] cur = q.poll();
-            int x = cur[0];
-            int y = cur[1];
-            int dist = cur[2];
-            
-            if (dist == 2) break;
-            
+            int x = cur[0], y = cur[1];
+            int dist = Math.abs(a - x) + Math.abs(b - y);
+
+            if (dist > 2) continue;
+            if (dist > 0 && map[x].charAt(y) == 'P') return false;
+            if (dist == 2) continue;
+
             for (int i = 0; i < 4; i++) {
-                int nx = x + dx[i];
-                int ny = y + dy[i];
-                
+                int nx = x + dx[i], ny = y + dy[i];
                 if (nx < 0 || ny < 0 || nx >= 5 || ny >= 5) continue;
-                if (place[nx].charAt(ny) == 'X') continue;
                 if (visited[nx][ny]) continue;
-                
-                if (place[nx].charAt(ny) == 'P' && (dist == 0 || dist == 1)) {
-                    return false;
-                }
-                
-                q.add(new int[]{nx, ny, dist + 1});
+                if (map[nx].charAt(ny) == 'X') continue;
+                visited[nx][ny] = true;
+                q.add(new int[]{nx, ny});
             }
         }
-        
         return true;
     }
 }
