@@ -1,10 +1,10 @@
 # [level 3] 표 편집 - 81303 
 
-[문제 링크](https://school.programmers.co.kr/learn/courses/30/lessons/81303?language=java) 
+[문제 링크](https://school.programmers.co.kr/learn/courses/30/lessons/81303) 
 
 ### 성능 요약
 
-메모리: 132 MB, 시간: 221.55 ms
+메모리: 132 MB, 시간: 199.39 ms
 
 ### 구분
 
@@ -16,7 +16,7 @@
 
 ### 제출 일자
 
-2025년 02월 24일 16:29:26
+2025년 09월 18일 19:09:17
 
 ### 문제 설명
 

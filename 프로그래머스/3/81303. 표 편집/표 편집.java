@@ -1,101 +1,45 @@
 import java.util.*;
 
 class Solution {
-    
-    static Stack<Node> trashCan = new Stack<>();
-    
-    static class Node {
-        Node prev, next;
-        boolean deleted = false;
-        
-        public Node d(int x) {
-            Node node = this;
-            for (int i = 0; i < x; i++) {
-                if (node.next != null) node = node.next;
-            }
-            return node;
-        }
-        
-        public Node u(int x) {
-            Node node = this;
-            for (int i = 0; i < x; i++) {
-                if (node.prev != null) node = node.prev;
-            }
-            return node;
-        }
-        
-        public Node c() {
-            this.deleted = true;
-            trashCan.push(this);
+    static Deque<Node> stack = new ArrayDeque<>();
 
-            if (this.prev != null) this.prev.next = this.next;
-            if (this.next != null) this.next.prev = this.prev;
-            
-            if (this.next!=null){
-                return this.next;
-            }
-            return this.prev;
-        }
-        
-        public void z() {
-            if(!trashCan.isEmpty()){
-                Node node = trashCan.pop();
-                node.deleted = false;
-                Node prev = node.prev;
-                Node next = node.next;
-            
-               if (prev != null) prev.next = node;
-               if (next != null) next.prev = node;
-            }
-        }
-    }
-    
     public String solution(int n, int k, String[] cmd) {
-        Node[] nodes = new Node[n];
-
+        ArrayList<Node> nodes = new ArrayList<>(n);
+        for (int i = 0; i < n; i++) nodes.add(new Node(i));
         for (int i = 0; i < n; i++) {
-            nodes[i] = new Node();
-            if (i > 0) {
-                nodes[i].prev = nodes[i - 1];
-                nodes[i - 1].next = nodes[i];
-            }
-        }
-        
-        Node now = nodes[k];
-
-        for (String command : cmd) {
-            char head = command.charAt(0);
-            // System.out.println(command);
-            if (head == 'U') {
-                now = now.u(Integer.parseInt(command.substring(2)));
-            } else if (head == 'D') {
-                now = now.d(Integer.parseInt(command.substring(2)));
-            } else if (head == 'C') {
-                now = now.c();
-            } else if (head == 'Z') {
-                if (!trashCan.isEmpty()) {
-                    now.z();
-                }
-            }
-            // for (int i = 0; i < n; i++){
-            //     if(nodes[i].deleted){
-            //         System.out.print("X ");
-            //     } else {
-            //         System.out.print("O ");
-            //     }
-            // }
-            // System.out.println();
+            if (i > 0) nodes.get(i).prev = nodes.get(i - 1);
+            if (i < n - 1) nodes.get(i).next = nodes.get(i + 1);
         }
 
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < n; i++){
-            if (nodes[i].deleted){
-                sb.append("X");
+        Node now = nodes.get(k);
+        for (String c : cmd) {
+            char op = c.charAt(0);
+            if (op == 'U' || op == 'D') {
+                int x = Integer.parseInt(c.substring(2));
+                while (x-- > 0) now = (op == 'U') ? now.prev : now.next;
+            } else if (op == 'C') {
+                stack.push(now);
+                now.deleted = true;
+                if (now.prev != null) now.prev.next = now.next;
+                if (now.next != null) now.next.prev = now.prev;
+                now = (now.next != null) ? now.next : now.prev;
             } else {
-                sb.append("O");
+                Node r = stack.pop();
+                r.deleted = false;
+                if (r.prev != null) r.prev.next = r;
+                if (r.next != null) r.next.prev = r;
             }
         }
 
+        StringBuilder sb = new StringBuilder(n);
+        for (int i = 0; i < n; i++) sb.append(nodes.get(i).deleted ? 'X' : 'O');
         return sb.toString();
+    }
+
+    static class Node {
+        int idx;
+        Node prev, next;
+        boolean deleted;
+        Node(int idx) { this.idx = idx; }
     }
 }
