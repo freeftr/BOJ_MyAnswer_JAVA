@@ -1,32 +1,24 @@
 import java.util.*;
-
 class Solution {
     public int[] solution(String s) {
         int[] answer = {};
-        
-        PriorityQueue<String> pq = new PriorityQueue<>((a, b) -> a.length() - b.length());
         s = s.substring(2, s.length() - 2);
-        String[] tuples = s.split("\\},\\{");
+        String[] a = s.split("\\},\\{");
+        Arrays.sort(a, (b, c) -> b.length() - c.length());
+        ArrayList<Integer> result = new ArrayList<>();
         
-        for (String tuple : tuples) {
-            pq.add(tuple);
-        }
-        ArrayList<String> result = new ArrayList<>();
-        
-        while (!pq.isEmpty()) {
-            String cur = pq.poll();
-            String[] temp = cur.split(",");
-            
+        for (int i = 0; i < a.length; i++) {
+            String[] temp = a[i].split(",");
             for (String t : temp) {
-                if (result.contains(t)) continue;
-                result.add(t);
+                if (!result.contains(Integer.parseInt(t))) {
+                    result.add(Integer.parseInt(t));
+                }
             }
         }
         
         answer = new int[result.size()];
-        
         for (int i = 0; i < result.size(); i++) {
-            answer[i] = Integer.parseInt(result.get(i));
+            answer[i] = result.get(i);
         }
         
         return answer;
@@ -34,5 +26,6 @@ class Solution {
 }
 
 /*
-- 순서가 다르면 다른 튜플
+튜플은 중복된 원소가 있을 수 있음.
+순서가 다르면 다른 튜플
 */
