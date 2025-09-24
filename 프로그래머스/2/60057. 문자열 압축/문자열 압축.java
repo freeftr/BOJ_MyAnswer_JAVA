@@ -1,41 +1,47 @@
+import java.util.*;
 class Solution {
     public int solution(String s) {
-        int length = s.length();
-        int answer = length;
-        
-        if (length == 1) {
-            return 1;
+        int answer = Integer.MAX_VALUE;
+        for (int i = 1; i <= s.length(); i++) {
+            answer = Math.min(answer, convert(s, i));
         }
-        
-        for (int i = 1; i <= length / 2; i++) {
-            int idx = 0;
-            String base = s.substring(idx, idx + i);
-            String result = "";
-            
-            idx += i;
-            
-            int cnt = 1;
-            while (idx + i <= length) {
-                String pattern = s.substring(idx, idx + i);
-                if (pattern.equals(base)) {
-                    cnt++;
-                } else {
-                    if (cnt > 1) result += cnt;
-                    result += base;
-                    base = pattern;
-                    cnt = 1;
-                }
-                idx += i;
-            }
-
-            if (cnt > 1) result += cnt;
-            result += base;
-
-            if (idx < length) result += s.substring(idx);
-
-            answer = Math.min(answer, result.length());
-        }
-        
         return answer;
+    }
+    
+    static int convert(String s, int length) {
+        ArrayList<String> list = new ArrayList<>();
+        
+        for (int i = 0; i < s.length(); i+= length) {
+            if (i + length > s.length()) {
+                list.add(s.substring(i));
+                break;
+            }
+            list.add(s.substring(i, i + length));
+        }
+        
+        if (list.size() == 1) return list.get(0).length() ;
+        
+        String prev = list.get(0);
+        String result = "";
+        int cnt = 1;
+        for (int i = 1; i < list.size(); i++) {
+            String now = list.get(i);
+            if (now.equals(prev)) {
+                cnt++;
+            } else {
+                if (cnt > 1) {
+                    String temp = cnt + prev;
+                    result += temp;
+                    cnt = 1;
+                    prev = now;
+                } else {
+                    result += prev;
+                    prev = now;
+                }
+            }
+        }
+        result += cnt == 1 ? list.get(list.size() - 1) : cnt + list.get(list.size() - 1);
+    
+        return result.length();
     }
 }
