@@ -1,48 +1,48 @@
 import java.util.*;
-
 class Solution {
-    
     static HashMap<String, Integer> map = new HashMap<>();
-    
     public String[] solution(String[] orders, int[] course) {
-        List<String> result = new ArrayList<>();
+        String[] answer = {};
+        ArrayList<String> result = new ArrayList<>();
         
-        for (int len : course) {
+        for (int menu : course) {
             map.clear();
-            for (String s : orders) {
-                char[] order = s.toCharArray();
-                Arrays.sort(order);
-                dfs(0, "", order, len);
+
+            for (String order : orders) {
+                String[] ordered = order.split("");
+                Arrays.sort(ordered);
+                dfs(ordered, 0, "", menu);
             }
             
-            int max = 2;
-            for (int value : map.values()) {
-                if (value > max) {
-                    max = value;
-                }
-            }
-            
-            for (String key : map.keySet()) {
-                if (map.get(key) == max) {
-                    result.add(key);
+            int max = 0;
+            for (int v : map.values()) max = Math.max(max, v);
+            if (max >= 2) {
+                for (Map.Entry<String, Integer> e : map.entrySet()) {
+                    if (e.getValue() == max) result.add(e.getKey());
                 }
             }
         }
         
         Collections.sort(result);
-        return result.toArray(new String[0]);
+        answer = new String[result.size()];
+        for (int i = 0; i < result.size(); i++) {
+            answer[i] = result.get(i);
+        }
+
+        return answer;
     }
     
-    static void dfs(int depth, String course, char[] order, int len) {
-        if (course.length() == len) {
-            map.put(course, map.getOrDefault(course, 0) + 1);
+    static void dfs(String[] ordered, int depth, String cur, int target) {
+        if (cur.length() == target) {
+            map.merge(cur, 1, (a, b) -> a + b);
             return;
         }
-        if (depth == order.length) {
-            return;
-        }
+        if (depth >= ordered.length) return;
         
-        dfs(depth + 1, course + order[depth], order, len);
-        dfs(depth + 1, course, order, len);
+        for (int i = depth; i < ordered.length; i++) {
+            String temp = cur;
+            temp += ordered[i];
+            dfs(ordered, i + 1, temp, target);
+        }
     }
 }
