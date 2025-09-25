@@ -1,52 +1,59 @@
-import java.io.*;
 import java.util.*;
-
 class Solution {
     public String solution(String play_time, String adv_time, String[] logs) {
-        int end = timeToInt(play_time);
-        int[] total = new int[360000];
+        String answer = "";
+        int[] total = new int[100 * 60 * 60];
+
+        if (play_time.equals(adv_time)) return "00:00:00";
 
         for (String log : logs) {
-            String[] s = log.split("-");
-            int start = timeToInt(s[0]);
-            int finish = timeToInt(s[1]);
-            for (int i = start; i < finish; i++) {
+            int s = strToInt(log.split("-")[0]);
+            int e = strToInt(log.split("-")[1]);
+            for (int i = s; i < e; i++) {
                 total[i]++;
             }
         }
 
-        int length = timeToInt(adv_time);
         long sum = 0;
-        for (int i = 0; i < length; i++) {
+        int len = strToInt(adv_time);
+        int end = strToInt(play_time);
+
+        for (int i = 0; i < len; i++) {
             sum += total[i];
         }
-
         long max = sum;
-        int res = 0;
+        answer = "00:00:00";
 
-        for (int i = length; i < end; i++) {
-            sum += total[i] - total[i - length];
+        for (int i = len; i < end; i++) {
+            sum += total[i];
+            sum -= total[i - len];
+
             if (sum > max) {
                 max = sum;
-                res = i - length + 1;
+                answer = intToStr(i - len + 1);
             }
         }
 
-        return intToTime(res);
+        return answer;
     }
 
-    static int timeToInt(String s) {
-        String[] times = s.split(":");
-        int hours = Integer.parseInt(times[0]);
-        int minutes = Integer.parseInt(times[1]);
-        int seconds = Integer.parseInt(times[2]);
-        return hours * 3600 + minutes * 60 + seconds;
+    static int strToInt(String s) {
+        int hour = Integer.parseInt(s.split(":")[0]);
+        int min  = Integer.parseInt(s.split(":")[1]);
+        int sec  = Integer.parseInt(s.split(":")[2]);
+        return hour * 60 * 60 + min * 60 + sec;
     }
-    
-    static String intToTime(int totalSeconds) {
-        int hours = totalSeconds / 3600;
-        int minutes = (totalSeconds % 3600) / 60;
-        int seconds = totalSeconds % 60;
-        return String.format("%02d:%02d:%02d", hours, minutes, seconds);
+
+    static String intToStr(int s) {
+        int hour = s / 3600;
+        s %= 3600;
+        int min  = s / 60;
+        int sec  = s % 60;
+
+        String h  = (hour < 10 ? "0" : "") + hour;
+        String m  = (min  < 10 ? "0" : "") + min;
+        String se = (sec  < 10 ? "0" : "") + sec;
+
+        return h + ":" + m + ":" + se;
     }
 }
