@@ -1,18 +1,21 @@
 import java.util.*;
-
 class Solution {
     public int[] solution(String[] id_list, String[] report, int k) {
-        int[] answer = new int[id_list.length];
-        HashMap<String, HashSet<String>> reportMap = new HashMap<>();
+        int[] answer = {};
+        HashMap<String, HashSet<String>> reportedMap = new HashMap<>();
         HashMap<String, Integer> result = new HashMap<>();
+        
         for (String rep : report) {
             String reporter = rep.split(" ")[0];
             String reported = rep.split(" ")[1];
-            reportMap.computeIfAbsent(reported, a -> new HashSet<>()).add(reporter);
+            
+            reportedMap.computeIfAbsent(reported, a -> new HashSet<>()).add(reporter);
         }
         
-        for (String key : reportMap.keySet()) {
-            HashSet<String> reporters = reportMap.get(key);
+        for (String reported : reportedMap.keySet()) {
+            HashSet<String> reporters = reportedMap.get(reported);
+            if (reporters == null) continue;
+            
             if (reporters.size() >= k) {
                 for (String reporter : reporters) {
                     result.merge(reporter, 1, (a, b) -> a + b);
@@ -20,17 +23,20 @@ class Solution {
             }
         }
         
+        answer = new int[id_list.length];
         for (int i = 0; i < answer.length; i++) {
-            String key = id_list[i];
-            if (result.get(key) == null) continue;
-            answer[i] = result.get(key);
-            System.out.println(i + " " + key + " " + answer[i]);
+            if (result.get(id_list[i]) == null) continue;
+            answer[i] = result.get(id_list[i]);
         }
         return answer;
     }
 }
 
 /*
-한번에 한명 유저 신고
-k번 이상일 신고한 모든 유저에게 메일
+조건
+- k번이상이면 정지
+- 정지 시 신고자에게 알림.
+
+요구
+- 몇번 신고성공하는지 알리기.
 */
