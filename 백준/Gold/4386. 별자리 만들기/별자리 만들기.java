@@ -1,79 +1,92 @@
-import java.nio.DoubleBuffer;
-import java.util.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.PriorityQueue;
+import java.util.StringTokenizer;
+
 public class Main {
-
+    static int n;
+    static ArrayList<Star> stars = new ArrayList<>();
     static int[] parent;
-    static PriorityQueue<Edge> pq = new PriorityQueue<>();
 
-    public static class Edge implements Comparable<Edge>{
-        int from;
-        int to;
-        double cost;
-
-        public Edge(int from, int to, double cost) {
-            this.from = from;
-            this.to = to;
-            this.cost = cost;
-        }
-
-        @Override
-        public int compareTo(Edge o){
-            return Double.compare(this.cost, o.cost);
-        }
-    }
-
-    public static void main(String[] args) throws IOException{
+    public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st;
 
-        int n = Integer.parseInt(br.readLine());
+        n = Integer.parseInt(br.readLine());
 
-        double[] X = new double[n+1];
-        double[] Y = new double[n+1];
-        parent = new int[n+1];
-
-        for(int i = 1; i <= n; i++){
-            parent[i]=i;
+        parent = new int[n];
+        for (int i = 0; i < n; i++) {
+            parent[i] = i;
         }
 
-        for(int i = 1; i <= n; i++){
+        for (int i = 0; i < n; i++) {
             st = new StringTokenizer(br.readLine());
             double x = Double.parseDouble(st.nextToken());
             double y = Double.parseDouble(st.nextToken());
-            X[i] = x;
-            Y[i] = y;
+
+            stars.add(new Star(i, x , y));
         }
 
-        for(int i = 1; i <= n; i++){
-            for(int j = 1; j <= n; j++){
-                double dist = Math.sqrt(Math.pow(X[i]-X[j],2)+Math.pow(Y[i]-Y[j],2));
-                pq.add(new Edge(i,j,dist));
+        PriorityQueue<Edge> pq = new PriorityQueue<>((a, b) -> Double.compare(a.cost, b.cost));
+
+        for (int i = 0; i < n; i++) {
+            for (int j = i; j < n; j++) {
+                if (i == j) continue;
+                Star a = stars.get(i);
+                Star b = stars.get(j);
+                pq.add(new Edge(i, j, Math.sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y))));
             }
         }
 
         int cnt = 0;
-        double ans = 0;
-        while(cnt<n-1){
+        double answer = 0;
+
+        while (cnt < n - 1) {
             Edge now = pq.poll();
-            if(find(now.from)!=find(now.to)){
-                union(now.from,now.to);
-                ans+=now.cost;
+
+            if (find(now.from) != find(now.to)) {
+                union(now.from, now.to);
+                answer += now.cost;
                 cnt++;
             }
         }
-        System.out.printf("%.2f", ans);
+
+        System.out.printf("%.2f", answer);
     }
 
-    public static int find(int v){
-        if(parent[v]==v)return v;
-        return parent[v]=find(parent[v]);
-    }
-
-    public static void union(int a, int b){
+    static void union(int a, int b) {
         a = find(a);
         b = find(b);
-        if(a > b) parent[a] = b;
-        else parent[b] = a;
+
+        parent[a] = b;
+    }
+
+    static int find(int v) {
+        if (v == parent[v]) return v;
+        return parent[v] = find(parent[v]);
+    }
+
+    static class Edge {
+        int from;
+        int to;
+        double cost;
+        Edge (int from, int to, double cost) {
+            this.from = from;
+            this.to = to;
+            this.cost = cost;
+        }
+    }
+
+    static class Star{
+        int idx;
+        double x;
+        double y;
+        Star(int idx, double x, double y) {
+            this.idx = idx;
+            this.x = x;
+            this.y = y;
+        }
     }
 }
