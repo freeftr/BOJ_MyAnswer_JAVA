@@ -1,54 +1,53 @@
-import java.io.*;
 import java.util.*;
-
 class Solution {
-    
-    // 생성된 정점 = 나가는 간선 존재(2개이상), 들어오는 간선 없음
-    // 막대 = 나가는 간선 없음, 들어오는 간선 1개
-    // 8자 = 나가는 간선2개, 들어오는 간선 2개
-    static int sv, stick = 0, eight = 0;
-    static ArrayList<Integer> indeg = new ArrayList<>();
-    static ArrayList<Integer> outdeg = new ArrayList<>();
-    
     public int[] solution(int[][] edges) {
-        int[] answer = new int[4];  
+        int[] answer = {};
+        int[] in = new int[1000001];
+        int[] out = new int[1000001];
+        HashSet<Integer> nodes = new HashSet<>();
         
         for (int[] edge : edges) {
-            int max = Math.max(edge[0], edge[1]);
-            if (indeg.size() <= max) {
-                while (indeg.size() <= max) {
-                    indeg.add(0);
-                    outdeg.add(0);
-                }
+            in[edge[1]]++;
+            out[edge[0]]++;
+            
+            nodes.add(edge[0]);
+            nodes.add(edge[1]);
+        }
+        
+        answer = new int[4];
+        for (int node : nodes) {
+            if (in[node] == 0 && out[node] >= 2) {
+                answer[0] = node;
+            }
+            if (in[node] >= 1 && out[node] == 0) {
+                answer[2]++;
+            }
+            if (in[node] >= 2 && out[node] >= 2) {
+                answer[3]++;
             }
         }
         
-        // 간선 정보 처리
-        for (int[] edge : edges) {
-            indeg.set(edge[1], indeg.get(edge[1]) + 1);
-            outdeg.set(edge[0], outdeg.get(edge[0]) + 1);
-        }
-        
-        for (int i = 0; i < indeg.size(); i++) {
-            // 생성된 정점
-            if (indeg.get(i) == 0 && outdeg.get(i) >= 2) {
-                sv = i;
-            }
-            // 막대 모양
-            if (indeg.get(i) >= 1 && outdeg.get(i) == 0) {
-                stick++;
-            }
-            // 8자 모양
-            if (indeg.get(i) >= 2 && outdeg.get(i) >= 2) {
-                eight++;
-            }
-        }
-        
-        answer[0] = sv;
-        answer[1] = outdeg.get(sv) - stick - eight;
-        answer[2] = stick;
-        answer[3] = eight;
-        
+        answer[1] = out[answer[0]] - answer[2] - answer[3];
         return answer;
     }
 }
+
+/*
+조건
+- 도넛: 다시 원래 정점 돌아옴.
+- 막대: 다시 안돌아옴.
+- 팔자: 도넛 두개 연결.
+
+요구
+- 정점
+- 도넛 수
+- 막대 수
+- 팔자 수
+
+풀이
+- 각 정점의 나가는 간선 수와 들어오는 간선 수 비교
+- 정점: 나가는 간선만 존재.
+- 도넛: 정점의 out - 막대 - 팔자
+- 막대: out = 1 in = 1
+- 팔자: out = 2 in = 2
+*/
