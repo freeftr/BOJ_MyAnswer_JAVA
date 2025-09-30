@@ -5,57 +5,64 @@ import java.util.StringTokenizer;
 
 public class Main {
 
-	static int N, M;
-	static int[] money;
-	static int sum;
-	static int ans = Integer.MAX_VALUE;
+    static int N, M;
 
-	public static void main(String[] args) throws IOException {
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringTokenizer st = new StringTokenizer(br.readLine());
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st = new StringTokenizer(br.readLine());
 
-		N = Integer.parseInt(st.nextToken());
-		M = Integer.parseInt(st.nextToken());
+        N = Integer.parseInt(st.nextToken());
+        M = Integer.parseInt(st.nextToken());
+        int[] arr = new int[N];
+        int max = 0;
+        int sum = 0;
+        for (int i = 0; i < N; i++) {
+            arr[i] = Integer.parseInt(br.readLine());
+            max = Math.max(max, arr[i]);
+            sum += arr[i];
+        }
 
-		money = new int[N];
+        long left = max;
+        long right = sum;
+        long answer = 0;
 
-		sum = 0;
-		int max = 0;
-		for (int i = 0; i < N; i++) {
-			money[i] = Integer.parseInt(br.readLine());
-			sum += money[i];
-			max = Math.max(max, money[i]);
-		}
+        while (left <= right) {
+            long mid = (left + right) / 2;
 
-		int left = max;
-		int right = sum;
+            if (check(mid, arr)) {
+                right = mid - 1;
+                answer = mid;
+            } else {
+                left = mid + 1;
+            }
+        }
 
-		while (left <= right) {
-			int mid = (left + right) / 2;
+        System.out.println(answer);
+    }
 
-			if (check(mid)){
-				right = mid - 1;
-				ans = mid;
-			} else {
-				left = mid + 1;
-			}
-		}
-		System.out.println(ans);
-	}
+    static boolean check(long mid, int[] arr) {
+        int m = 1;
+        long K = mid;
+        for (int i = 0; i < N; i++) {
+            if (arr[i] <= K) {
+                K -= arr[i];
+            } else {
+                K = mid - arr[i];
+                m++;
+            }
+        }
 
-	static boolean check(int mid) {
-		int temp = mid;
-		int cnt = 1;
-
-		for (int i = 0; i < N; i++) {
-			if (temp >= money[i]) {
-				temp -= money[i];
-			} else {
-				cnt++;      
-				temp = mid - money[i]; 
-			}
-		}
-
-		return cnt <= M; // M번 이하로 인출 가능해야 true
-	}
+        return m <= M;
+    }
 }
+
+/*
+조건
+- N일 중에 M번만 꺼내기
+- K원 인출
+- 가능 시 그대로 사용.
+- 불가능 시 남은 금액 통장에 집어넣고 인출
+
+요구
+- 최소금액 K 구하기
+ */
