@@ -1,44 +1,46 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayDeque;
 
 public class Main {
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        char[] s = br.readLine().toCharArray();
 
-        String s = br.readLine();
+        ArrayDeque<Integer> cQ = new ArrayDeque<>();
+        ArrayDeque<Integer> bQ = new ArrayDeque<>();
+        ArrayDeque<Integer> aQ = new ArrayDeque<>();
+
+        for (int i = 0; i < s.length; i++) {
+            if (s[i] == 'C') cQ.addLast(i);
+            else if (s[i] == 'B') bQ.addLast(i);
+            else if (s[i] == 'A') aQ.addLast(i);
+        }
 
         int answer = 0;
-        int c = 0, b = 0;
+        ArrayDeque<Integer> bLeft = new ArrayDeque<>();
 
-        for (int i = s.length() - 1; i >= 0 ; i--) {
-            char cur = s.charAt(i);
-
-            if (cur == 'C') c++;
-            if (cur == 'B') {
-                if (c > 0) {
-                    answer++;
-                    c--;
-                } else {
-                    b++;
-                }
-            }
-            if (cur == 'A') {
-                if (b > 0) {
-                    answer++;
-                    b--;
-                }
+        while (!bQ.isEmpty()) {
+            int b = bQ.pollFirst();
+            while (!cQ.isEmpty() && cQ.peekFirst() < b) cQ.pollFirst();
+            if (!cQ.isEmpty()) {
+                answer++;
+                cQ.pollFirst();
+            } else {
+                bLeft.addLast(b);
             }
         }
+
+        while (!bLeft.isEmpty()) {
+            int b = bLeft.pollLast();
+            while (!aQ.isEmpty() && aQ.peekLast() > b) aQ.pollLast();
+            if (!aQ.isEmpty()) {
+                answer++;
+                aQ.pollLast();
+            }
+        }
+
         System.out.println(answer);
     }
 }
-
-/*
-요구
-- 1: A와 그 뒤에 있는 B 지우기
-- 2: B와 그 뒤에 있는 C 지우기
-
-풀이
-- 지울 수 있는 CB 지우기
- */
