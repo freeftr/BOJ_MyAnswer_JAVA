@@ -30,25 +30,34 @@ public class Main {
             nodes.add(new Node(X[i], T[i]));
         }
 
-        Collections.sort(nodes, (a, b) -> a.time - b.time);
+        Collections.sort(nodes, (a, b) -> b.x - a.x);
 
         int idx = 0;
         int time = 0;
-        for (Node node : nodes) {
-            int nextIdx = node.x;
-            int nextTime = node.time;
 
-            time += Math.abs(nextIdx - idx);
-            idx = nextIdx;
+        Node end = nodes.get(0);
+        int endIdx = end.x;
+        int endTime = end.time;
 
-            if (time < nextTime) {
-                time += nextTime - time;
+        // 끝으로 설정
+        time = Math.max(endTime, endIdx);
+//        System.out.println(endIdx + " " + time);
+
+        for (int i = 1; i < nodes.size(); i++) {
+            int nextTime = nodes.get(i).time;
+            int nextIdx = nodes.get(i).x;
+
+            if (nextTime > time + endIdx - nextIdx) {
+                time = nextTime;
+            } else {
+                time += endIdx - nextIdx;
             }
+
+//            System.out.println(nextIdx + " " + time);
+            endIdx = nextIdx;
         }
 
-        time += idx;
-
-        System.out.println(time);
+        System.out.println(time + endIdx);
     }
 
     static class Node {
