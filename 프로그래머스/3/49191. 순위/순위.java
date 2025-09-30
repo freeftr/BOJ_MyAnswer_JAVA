@@ -1,42 +1,41 @@
-import java.io.*;
 import java.util.*;
-
 class Solution {
-
     public int solution(int n, int[][] results) {
-        final int INF = 1_000_000_000;
+        int answer = 0;
+        
         int[][] dist = new int[n + 1][n + 1];
-
-        // 초기화
+        
         for (int i = 1; i <= n; i++) {
-            Arrays.fill(dist[i], INF);
+            Arrays.fill(dist[i], Integer.MAX_VALUE);
             dist[i][i] = 0;
         }
-        for (int[] r : results) {
-            int a = r[0], b = r[1];
-            dist[a][b] = 1;
+        
+        for (int[] result : results) {
+            dist[result[0]][result[1]] = 1;
         }
-
+        
         for (int k = 1; k <= n; k++) {
-            for (int i = 1; i <= n; i++) {
-                if (dist[i][k] == INF) continue;
+            for (int i = 1; i <= n; i++) {                
+                if (dist[i][k] == Integer.MAX_VALUE) continue;
                 for (int j = 1; j <= n; j++) {
-                    if (dist[k][j] == INF) continue;
+                    if (dist[k][j] == Integer.MAX_VALUE) continue;
                     if (dist[i][j] > dist[i][k] + dist[k][j]) {
                         dist[i][j] = dist[i][k] + dist[k][j];
                     }
                 }
             }
         }
-
-        int answer = 0;
+        
         for (int i = 1; i <= n; i++) {
-            int known = 0;
+            int cnt = 0;
             for (int j = 1; j <= n; j++) {
                 if (i == j) continue;
-                if (dist[i][j] != INF || dist[j][i] != INF) known++;
+                if (dist[i][j] != Integer.MAX_VALUE || dist[j][i] != Integer.MAX_VALUE) {
+                    cnt++;
+                }
             }
-            if (known == n - 1) answer++;
+            
+            if (cnt == n - 1) answer++;
         }
         return answer;
     }
