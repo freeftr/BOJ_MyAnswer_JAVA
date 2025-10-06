@@ -1,38 +1,35 @@
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Arrays;
 
 public class Main {
-    static StringBuilder sb = new StringBuilder();
-
-    static int N;
-
-    public static void main(String[] args) throws IOException{
+    public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        int T = Integer.parseInt(br.readLine());
+        int t = Integer.parseInt(br.readLine());
 
-        for(int t = 1; t <= T; t++){
-            N = Integer.parseInt(br.readLine());
+        for (int tc = 0; tc < t; tc++) {
+            int n = Integer.parseInt(br.readLine());
 
-            String[] numbers = new String[N];
+            String[] arr = new String[n];
 
-            for(int i = 0; i < N; i++){
-                numbers[i] = br.readLine();
+            for (int i = 0; i < n; i++) {
+                arr[i] = br.readLine();
             }
 
-            Arrays.sort(numbers);
-
+            Arrays.sort(arr);
+            
             String ans = "YES";
 
-            for(int i = 0; i < N-1; i++){
-                if(numbers[i+1].startsWith(numbers[i])){
+            for (int i = 0; i < n - 1; i++) {
+                if (arr[i + 1].startsWith(arr[i])) {
                     ans = "NO";
-                    break;
+                    continue;
                 }
             }
 
-            sb.append(ans+"\n");
+            System.out.println(ans);
         }
-        System.out.println(sb);
     }
 }
