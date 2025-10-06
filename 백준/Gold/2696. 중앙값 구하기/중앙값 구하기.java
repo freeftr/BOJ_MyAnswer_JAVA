@@ -1,60 +1,63 @@
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.PriorityQueue;
+import java.util.StringTokenizer;
 
 public class Main {
-    static StringBuilder sb = new StringBuilder();
+    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    static StringTokenizer st;
 
-    static int M;
+    public static void main(String[] args) throws IOException {
+        StringBuilder sb = new StringBuilder();
 
-    public static void main(String[] args) throws IOException{
-        Scanner sc = new Scanner(System.in);
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-        StringTokenizer st;
+        int t = Integer.parseInt(br.readLine().trim());
 
-        int T = sc.nextInt();
+        for (int tc = 0; tc < t; tc++) {
+            int M = nextInt();
 
-        for(int t = 1; t <= T; t++){
+            PriorityQueue<Integer> max = new PriorityQueue<>((a, b) -> b - a);
+            PriorityQueue<Integer> min = new PriorityQueue<>();
 
-            M = sc.nextInt();
+            int[] result = new int[(M + 1) / 2];
+            int idx = 0;
 
-            int length = (M + 1)/2;
+            for (int i = 0; i < M; i++) {
+                int a = nextInt();
 
-            sb.append(length+"\n");
+                if (max.isEmpty() || a <= max.peek()) max.add(a);
+                else min.add(a);
 
-            PriorityQueue<Integer> pq = new PriorityQueue<>();
-            PriorityQueue<Integer> temp = new PriorityQueue<>();
+                if (max.size() > min.size() + 1) {
+                    min.add(max.poll());
+                }
+                if (max.size() < min.size()) {
+                    max.add(min.poll());
+                }
 
-            for(int i = 1; i <= M; i++){
-
-                int b = sc.nextInt();
-
-                pq.add(b);
-
-                if(i%2==1) {
-
-                    for (int j = 1; j <= (i + 1) / 2; j++) {
-
-                        int a = pq.poll();
-
-                        if(j==(i+1)/2) {
-                            sb.append(a + " ");
-//                            System.out.println(a);
-                        }
-
-                        temp.add(a);
-                    }
-
-                    pq.addAll(temp);
-                    temp.clear();
-
+                if (i % 2 == 0) {
+                    result[idx++] = max.peek();
                 }
             }
 
-            sb.append("\n");
+            sb.append(result.length).append("\n");
+            for (int i = 0; i < result.length; i++) {
+                sb.append(result[i]).append(" ");
+                if ((i + 1) % 10 == 0) sb.append("\n");
+            }
+            if (result.length % 10 != 0) sb.append("\n");
         }
 
-        bw.write(sb.toString());
-        bw.close();
+        System.out.print(sb);
+    }
+
+    static int nextInt() throws IOException {
+        while (st == null || !st.hasMoreTokens()) {
+            String line = br.readLine();
+            while (line != null && line.trim().isEmpty()) line = br.readLine();
+            if (line == null) throw new IOException("Unexpected EOF");
+            st = new StringTokenizer(line);
+        }
+        return Integer.parseInt(st.nextToken());
     }
 }
