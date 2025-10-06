@@ -1,5 +1,4 @@
 import java.util.*;
-
 class Solution {
     public String solution(String p) {
         String answer = "";
@@ -8,64 +7,54 @@ class Solution {
     }
     
     static String dfs(String s) {
-        if (s == "") return s;
+        if (s.equals("")) return "";
         
         String u = "";
         String v = "";
-        
-        for (int i = 2; i <= s.length(); i+=2) {
-            if (balance(s.substring(0, i))) {
-                u = s.substring(0, i);
+        for (int i = 1; i <= s.length(); i++) {
+            u = s.substring(0, i);
+            
+            if (checkBalance(u)) {
                 v = s.substring(i);
                 break;
             }
         }
         
-        if (check(u)) {
+        if (checkRight(u)) {
             return u + dfs(v);
         } else {
             String temp = "(" + dfs(v) + ")";
-            for (int i = 1; i < u.length() - 1; i++) {
+            u = u.substring(1, u.length() - 1);
+            for (int i = 0; i < u.length(); i++) {
                 temp += u.charAt(i) == '(' ? ')' : '(';
             }
+            
             return temp;
         }
     }
     
-    static boolean balance(String s) {
+    static boolean checkBalance(String s) {
         int left = 0;
         int right = 0;
         for (int i = 0; i < s.length(); i++) {
             if (s.charAt(i) == '(') left++;
             if (s.charAt(i) == ')') right++;
         }
+        
         return left == right;
     }
     
-    static boolean check(String s) {
-        Deque<Character> stack = new ArrayDeque<>();
+    static boolean checkRight(String s) {
+        Stack<Character> stack = new Stack<>();
         for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            if (c == '(') {
-                stack.push(c);
+            if (s.charAt(i) == '(') {
+                stack.push('(');
             } else {
                 if (stack.isEmpty()) return false;
-                stack.pop();
+                if (stack.peek() == '(') stack.pop();
             }
         }
+        
         return stack.isEmpty();
     }
 }
-
-/*
-빈 문자열 -> 빈 문자열 반환
-u와 v로 분리
-- u는 더이상 균형잡힌 문자열이되면 안댐.
-- v는 빈 문자열일 수 있음.
-
-u가 올바른 문자열이 아니면 
-- 빈문자열에 (붙이기
-- v에 대해 재귀 수행
-- ')'다시 붙이기
-- u의 첫 마지막 제거, 
-*/
