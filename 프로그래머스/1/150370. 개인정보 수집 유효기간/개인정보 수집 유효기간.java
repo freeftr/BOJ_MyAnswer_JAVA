@@ -2,54 +2,39 @@ import java.util.*;
 
 class Solution {
     public int[] solution(String today, String[] terms, String[] privacies) {
-        int[] answer = {};
-        int length = privacies.length;
-        HashMap<String, Integer> termMap = new HashMap<>();
-        ArrayList<Integer> result = new ArrayList<>();
-        
-        for (String term : terms) {
-            String type = term.split(" ")[0];
-            int due = Integer.parseInt(term.split(" ")[1]);
-            
-            termMap.put(type, due);
+        Map<String, Integer> termMap = new HashMap<>();
+        for (String t : terms) {
+            String[] sp = t.split(" ");
+            termMap.put(sp[0], Integer.parseInt(sp[1]));
         }
-        
-        
-        String[] t = today.split("\\.");
-        int tYear = Integer.parseInt(t[0]);
-        int tMonth = Integer.parseInt(t[1]);
-        int tDay = Integer.parseInt(t[2]);
-            
-        int tm = tYear * 12 * 28 + tMonth * 28 + tDay;
-        
-        for (int i = 0; i < length; i++) {
-            String[] s1 = privacies[i].split(" ");
-            String[] s = s1[0].split("\\.");
-            int year = Integer.parseInt(s[0]);
-            int month = Integer.parseInt(s[1]);
-            int day = Integer.parseInt(s[2]);
-            String type = s1[1];
-            int due = termMap.get(type);
-            
-            int m = year * 12 * 28 + month * 28 + day + due * 28 - 1;
-            
-            if (tm > m) {
-                result.add(i + 1);
+
+        int todayDays = toDays(today);
+        List<Integer> list = new ArrayList<>();
+
+        for (int i = 0; i < privacies.length; i++) {
+            String[] sp = privacies[i].split(" ");
+            String collected = sp[0];
+            String termKey = sp[1];
+            int periodMonths = termMap.get(termKey);
+
+            int collectedDays = toDays(collected);
+            int expireDays = collectedDays + periodMonths * 28 - 1;
+
+            if (todayDays > expireDays) {
+                list.add(i + 1);
             }
         }
-        
-        Collections.sort(result);
-        answer = new int[result.size()];
-        for (int i = 0; i < result.size(); i++) {
-            answer[i] = result.get(i);
-        }
-        
+
+        int[] answer = new int[list.size()];
+        for (int i = 0; i < list.size(); i++) answer[i] = list.get(i);
         return answer;
     }
-}
 
-/*
-n개의 개인정보
-약관 유효기간.
-- 파기 해야할 개인정보 번호 구하기.
-*/
+    static int toDays(String date) {
+        String[] sp = date.split("\\.");
+        int y = Integer.parseInt(sp[0]);
+        int m = Integer.parseInt(sp[1]);
+        int d = Integer.parseInt(sp[2]);
+        return (y * 12 + (m - 1)) * 28 + d;
+    }
+}
