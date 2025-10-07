@@ -1,49 +1,41 @@
 class Solution {
-    // d, l, r, u => 사전순
     static int[] dx = {1, 0, 0, -1};
     static int[] dy = {0, -1, 1, 0};
     static char[] dir = {'d', 'l', 'r', 'u'};
-    static StringBuilder result;
+    static int N, M;
+    static String result = "";
 
     public String solution(int n, int m, int x, int y, int r, int c, int k) {
-        result = new StringBuilder();
-        if (dfs(n, m, x, y, r, c, k, new StringBuilder())) {
-            return result.toString();
+        N = n; M = m;
+        x--; y--; r--; c--;
+
+        if (dfs(x, y, new StringBuilder(), 0, r, c, k)) {
+            return result;
         } else {
             return "impossible";
         }
     }
 
-    static boolean dfs(int n, int m, int x, int y, int r, int c, int k, StringBuilder path) {
-        // 목표 지점까지 남은 거리 계산
-        int dist = Math.abs(x - r) + Math.abs(y - c);
+    static boolean dfs(int x, int y, StringBuilder sb, int dist, int r, int c, int k) {
+        if (dist > k) return false;
+        
+        if (Math.abs(x - r) + Math.abs(y - c) > k - dist) return false;
+        if ((Math.abs(x - r) + Math.abs(y - c)) % 2 != (k - dist) % 2) return false;
 
-        // 가지치기
-        if (dist > k || (k - dist) % 2 != 0) {
-            return false;
-        }
-
-        if (k == 0) {
-            if (x == r && y == c) {
-                result = new StringBuilder(path);
-                return true;
-            }
-            return false;
+        if (dist == k && x == r && y == c) {
+            result = sb.toString();
+            return true;
         }
 
         for (int i = 0; i < 4; i++) {
             int nx = x + dx[i];
             int ny = y + dy[i];
+            if (nx < 0 || ny < 0 || nx >= N || ny >= M) continue;
 
-            if (nx < 1 || ny < 1 || nx > n || ny > m) continue;
-
-            path.append(dir[i]);
-            if (dfs(n, m, nx, ny, r, c, k - 1, path)) {
-                return true; 
-            }
-            path.deleteCharAt(path.length() - 1);
+            sb.append(dir[i]);
+            if (dfs(nx, ny, sb, dist + 1, r, c, k)) return true;
+            sb.deleteCharAt(sb.length() - 1);
         }
-
         return false;
     }
 }
