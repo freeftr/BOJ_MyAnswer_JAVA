@@ -7,21 +7,21 @@ class Solution {
         if (nums.length == 0) return 0;
         
         for (String num : nums) {
-            long temp = Long.parseLong(num);
-            if (check(temp)) answer++;
+            if (check(Long.parseLong(num))) answer++;
         }
         return answer;
     }
     
     static boolean check(long num) {
-        if (num == 0) return false;
-        if (num == 1) return false;
+        if (num < 2) return false;
         if (num == 2) return true;
         if (num % 2 == 0) return false;
-        
-        for (long i = 3; i <= Math.sqrt(num); i++) {
+
+        long limit = (long) Math.sqrt(num);
+        for (long i = 3; i <= limit; i += 2) {
             if (num % i == 0) return false;
         }
         return true;
     }
+
 }
