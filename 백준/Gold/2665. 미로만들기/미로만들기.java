@@ -1,72 +1,58 @@
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.*;
 
 public class Main {
 
     static int n;
-    static char[][] map;
-
-    static boolean[][][] visited;
-    static int[] dx = {1,-1,0,0};
-    static int[] dy = {0,0,1,-1};
+    static int[][] map;
+    static int[] dx = {0, 0, 1, -1};
+    static int[] dy = {1, -1, 0, 0};
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer st;
 
         n = Integer.parseInt(br.readLine());
-        map = new char[n][n];
+        int[][] dist = new int[n][n];
+        map = new int[n][n];
 
         for (int i = 0; i < n; i++) {
-            String s = br.readLine();
+            Arrays.fill(dist[i], Integer.MAX_VALUE);
+            String[] s = br.readLine().split("");
             for (int j = 0; j < n; j++) {
-                map[i][j] = s.charAt(j);
+                map[i][j] = Integer.parseInt(s[j]); // 0=검은, 1=흰
             }
         }
 
-        bfs();
+        PriorityQueue<int[]> pq = new PriorityQueue<>((a, b) -> a[0] - b[0]);
+        dist[0][0] = 0;
+        pq.add(new int[]{0, 0, 0});
 
-        for (int i = 0; i < n*n; i++) {
-            if(visited[n-1][n-1][i]){
-                System.out.println(i);
-                break;
-            }
-        }
-    }
+        while (!pq.isEmpty()) {
+            int[] cur = pq.poll();
+            int cost = cur[0];
+            int x = cur[1];
+            int y = cur[2];
 
-    static void bfs(){
-        Queue<int[]> q = new LinkedList<>();
-        visited = new boolean[n][n][n*n];
-        q.add(new int[]{0,0,0});
-        visited[0][0][0] = true;
+            if (cost > dist[x][y]) continue;
+            if (x == n - 1 && y == n - 1) break;
+            
+            for (int d = 0; d < 4; d++) {
+                int nx = x + dx[d];
+                int ny = y + dy[d];
+                if (nx < 0 || ny < 0 || nx >= n || ny >= n) continue;
 
-        int min = Integer.MAX_VALUE;
-        while(!q.isEmpty()){
-            int[] cur = q.poll();
-            int x = cur[0],y = cur[1];
-            int black = cur[2];
+                int w = (map[nx][ny] == 0) ? 1 : 0;
+                int ncost = cost + w;
 
-            if(min<black) continue;
-            if(x==n-1 && y==n-1){
-                min = Math.min(min,black);
-                continue;
-            }
-
-            for (int i = 0; i < 4; i++) {
-                int nx = x + dx[i];
-                int ny = y + dy[i];
-
-                if(nx<0 || ny<0 || nx>n-1 || ny>n-1) continue;
-                if(visited[nx][ny][black])continue;
-                if(map[nx][ny]=='1'){
-                    visited[nx][ny][black] = true;
-                    q.offer(new int[]{nx,ny,black});
-                }
-                else if(map[nx][ny]=='0'){
-                    visited[nx][ny][black] = true;
-                    q.offer(new int[]{nx,ny,black+1});
+                if (ncost < dist[nx][ny]) {
+                    dist[nx][ny] = ncost;
+                    pq.add(new int[]{ncost, nx, ny});
                 }
             }
         }
+
+        System.out.println(dist[n - 1][n - 1]);
     }
 }
