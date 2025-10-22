@@ -1,51 +1,52 @@
 import java.util.*;
-
 class Solution {
     public int solution(int[] queue1, int[] queue2) {
         int answer = 0;
+        long one = 0;
+        long two = 0;
         
-        long sum1 = 0;
-        long sum2 = 0;
-        Queue<Integer> a = new LinkedList<>();
-        Queue<Integer> b = new LinkedList<>();
+        Queue<Integer> q1 = new ArrayDeque<>();
+        Queue<Integer> q2 = new ArrayDeque<>();
         
         for (int i = 0; i < queue1.length; i++) {
-            sum1 += queue1[i];
-            sum2 += queue2[i];
-            
-            a.add(queue1[i]);
-            b.add(queue2[i]);
+            one += queue1[i];
+            two += queue2[i];
+            q1.add(queue1[i]);
+            q2.add(queue2[i]);
         }
         
-        if (sum1 == sum2) return 0;
+        if (q1.isEmpty() && q2.isEmpty()) {
+            return 0;
+        }
         
-        int idx = 0;
-        while (sum1 != sum2 && idx <= queue1.length * 2 + 1) {
-            if (sum1 > sum2) {
-                int at = a.poll();
-                sum1 -= at;
-                sum2 += at;
-                b.add(at);
-            } else {
-                int bt = b.poll();
-                sum2 -= bt;
-                sum1 += bt;
-                a.add(bt);
+        long limit = q1.size() + q2.size();
+        
+        while (answer <= limit + 1) {
+            if (one > two) {
+                int temp = q1.poll();
+                q2.add(temp);
+                one -= temp;
+                two += temp;
+            } else if (one == two) {
+                break;
+            } else if (two > one) {
+                int temp = q2.poll();
+                q1.add(temp);
+                one += temp;
+                two -= temp;
             }
-            idx++;
             answer++;
         }
         
-        if (sum1 != sum2) return -1;
-        
-        return answer;
+        return one == two ? answer : -1;
     }
 }
 
 /*
-각 큐의 원소의 합이 같도록
-최소 작업 수 구하기
+조건
+- 하나의 큐에서 다른 큐에 넣는 작업으로 두 큐의 합이 같게.
+- pop + insert = 1;
 
-- 각 큐 합 구하면서 큐에 넣기.
-- 큰 쪽에서 작은 쪽으로 옮기기
+요구
+- 필요한 최소 횟수.
 */
