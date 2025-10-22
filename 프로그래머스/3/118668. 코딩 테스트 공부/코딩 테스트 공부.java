@@ -2,67 +2,51 @@ import java.util.*;
 
 class Solution {
     public int solution(int alp, int cop, int[][] problems) {
-        int answer = 0;
-        int alp_target = 0;
-        int cop_target = 0;
-        
+        int target_alp = 0, target_cop = 0;
         for (int[] p : problems) {
-            int alp_req = p[0];
-            int cop_req = p[1];
-            
-            alp_target = Math.max(alp_req, alp_target);
-            cop_target = Math.max(cop_req, cop_target);
+            target_alp = Math.max(target_alp, p[0]);
+            target_cop = Math.max(target_cop, p[1]);
         }
-        
-        // 이미 충족한 경우
-        if (alp >= alp_target && cop >= cop_target) return 0;
-        
-        alp = Math.min(alp, alp_target);
-        cop = Math.min(cop, cop_target);
-        
-        int[][] dp = new int[alp_target + 2][cop_target + 2];
-        
-        for (int i = 0; i <= alp_target; i++) {
-            Arrays.fill(dp[i], Integer.MAX_VALUE);
+
+        alp = Math.min(alp, target_alp);
+        cop = Math.min(cop, target_cop);
+
+        int INF = Integer.MAX_VALUE / 4;
+        int[][] dp = new int[target_alp + 1][target_cop + 1];
+        for (int i = 0; i <= target_alp; i++) {
+            Arrays.fill(dp[i], INF);
         }
-        
         dp[alp][cop] = 0;
-        
-        for (int i = alp; i <= alp_target; i++) {
-            for (int j = cop; j <= cop_target; j++) {
-                // 공부하는 경우
-                dp[i + 1][j] = Math.min(dp[i + 1][j], dp[i][j] + 1);
-                dp[i][j + 1] = Math.min(dp[i][j + 1], dp[i][j] + 1);
-                
-                for (int[] p : problems) {
-                    int alp_req = p[0];
-                    int cop_req = p[1];
-                    int alp_rwd = p[2];
-                    int cop_rwd = p[3];
-                    int cost = p[4];
-                    
-                    // 현재 문제 풀 수 없는 경우
-                    if (i < alp_req || j < cop_req) continue;
-                    
-                    int na = Math.min(i + alp_rwd, alp_target);
-                    int nc = Math.min(j + cop_rwd, cop_target);
-                    
-                    dp[na][nc] = Math.min(dp[i][j] + cost, dp[na][nc]);
+
+        for (int i = alp; i <= target_alp; i++) {
+            for (int j = cop; j <= target_cop; j++) {
+                if (dp[i][j] == INF) continue;
+
+                // 공부 전이
+                if (i + 1 <= target_alp) {
+                    dp[i + 1][j] = Math.min(dp[i + 1][j], dp[i][j] + 1);
+                }
+                if (j + 1 <= target_cop) {
+                    dp[i][j + 1] = Math.min(dp[i][j + 1], dp[i][j] + 1);
+                }
+
+                // 문제 풀이 전이
+                for (int[] problem : problems) {
+                    int req_alp = problem[0];
+                    int req_cop = problem[1];
+                    int rew_alp = problem[2];
+                    int rew_cop = problem[3];
+                    int cost = problem[4];
+
+                    if (i >= req_alp && j >= req_cop) {
+                        int new_alp = Math.min(target_alp, i + rew_alp);
+                        int new_cop = Math.min(target_cop, j + rew_cop);
+                        dp[new_alp][new_cop] = Math.min(dp[new_alp][new_cop], dp[i][j] + cost);
+                    }
                 }
             }
         }
-        
-        return dp[alp_target][cop_target];
+
+        return dp[target_alp][target_cop];
     }
 }
-
-/*
-알고, 코딩 모두 기준치 넘어야 문제 푸는거 가능
-알고공부 = 1시간에 1증가
-코딩공부 = 1시간에 1증가
-문제풀면 주어진만큼 증가
-같은 문제 푸는거 가능
-모든 문제 풀 수 있는 알, 코 얻는 최단 시간 구하기.
-
-- dp[목표 알고력][목표 코딩력]
-*/
