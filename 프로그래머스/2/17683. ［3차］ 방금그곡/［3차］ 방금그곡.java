@@ -1,54 +1,68 @@
 import java.util.*;
 
 class Solution {
-
     public String solution(String m, String[] musicinfos) {
-        String answer = "(None)";
-        int max = 0;
+        String target = erase(m);
 
-        m = normalizeMelody(m);
+        List<Music> result = new ArrayList<>();
+        int order = 0;
 
         for (String info : musicinfos) {
             String[] parts = info.split(",");
-            String start = parts[0];
-            String end = parts[1];
-            String title = parts[2];
+            int start = strToInt(parts[0]);
+            int end   = strToInt(parts[1]);
+            String title  = parts[2];
             String melody = parts[3];
 
-            int startHour = Integer.parseInt(start.split(":")[0]);
-            int startMinute = Integer.parseInt(start.split(":")[1]);
-            int endHour = Integer.parseInt(end.split(":")[0]);
-            int endMinute = Integer.parseInt(end.split(":")[1]);
+            int duration = end - start;
 
-            int playTime = (endHour * 60 + endMinute) - (startHour * 60 + startMinute);
+            String base = erase(melody);
 
-            String normalizedMelody = normalizeMelody(melody);
-            StringBuilder played = new StringBuilder();
+            StringBuilder sb = new StringBuilder();
+            while (sb.length() < duration) sb.append(base);
+            String played = sb.substring(0, duration);
 
-            for (int i = 0; i < playTime; i++) {
-                played.append(normalizedMelody.charAt(i % normalizedMelody.length()));
+            if (played.contains(target)) {
+                result.add(new Music(title, duration, order));
             }
-
-            if (played.toString().contains(m)) {
-                if (playTime > max) {
-                    max = playTime;
-                    answer = title;
-                }
-            }
+            order++;
         }
 
-        return answer;
+        if (result.isEmpty()) return "(None)";
+
+        result.sort((a, b) -> {
+            if (a.dur != b.dur) return b.dur - a.dur;
+            return a.idx - b.idx;
+        });
+
+        return result.get(0).title;
     }
 
-    private String normalizeMelody(String melody) {
+    static class Music {
+        String title;
+        int dur;
+        int idx;
+        Music(String title, int dur, int idx) {
+            this.title = title;
+            this.dur = dur;
+            this.idx = idx;
+        }
+    }
+
+    public int strToInt(String s) {
+        String[] t = s.split(":");
+        return Integer.parseInt(t[0]) * 60 + Integer.parseInt(t[1]);
+    }
+
+    public String erase(String s) {
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < melody.length(); i++) {
-            char c = melody.charAt(i);
-            if (c == '#') {
-                int lastIndex = sb.length() - 1;
-                sb.setCharAt(lastIndex, Character.toLowerCase(sb.charAt(lastIndex)));
+        for (int i = 0; i < s.length(); i++) {
+            char ch = s.charAt(i);
+            if (i + 1 < s.length() && s.charAt(i + 1) == '#') {
+                sb.append(Character.toLowerCase(ch));
+                i++;
             } else {
-                sb.append(c);
+                sb.append(ch);
             }
         }
         return sb.toString();
