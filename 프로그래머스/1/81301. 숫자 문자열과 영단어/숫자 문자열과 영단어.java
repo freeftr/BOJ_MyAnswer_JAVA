@@ -1,7 +1,7 @@
-import java.util.*;
 class Solution {
     public int solution(String s) {
-        s = s.replaceAll("zero", "0");
+        int answer = 0;
+        
         s = s.replaceAll("one", "1");
         s = s.replaceAll("two", "2");
         s = s.replaceAll("three", "3");
@@ -9,9 +9,16 @@ class Solution {
         s = s.replaceAll("five", "5");
         s = s.replaceAll("six", "6");
         s = s.replaceAll("seven", "7");
-        s = s.replaceAll("eight", "8");
+        s = s = s.replaceAll("eight", "8");
         s = s.replaceAll("nine", "9");
-        int answer = Integer.parseInt(s);
-        return answer;
+        s = s.replaceAll("zero", "0");
+        
+        return Integer.parseInt(s);
     }
 }
+
+/*
+조건
+- 숫자 일부 자릿수를 영단어로 바꿈.
+- 이거의
+*/
