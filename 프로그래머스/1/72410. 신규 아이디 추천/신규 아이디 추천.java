@@ -1,72 +1,72 @@
 class Solution {
     public String solution(String new_id) {
         String answer = "";
-        System.out.println("0 " + new_id);
-        //1.
+        StringBuilder sb = new StringBuilder();
+        
+        // 1. 소문자화
         new_id = new_id.toLowerCase();
-        System.out.println("1 " + new_id);
         
-        String temp = "";
-        //2.
+        // 2. 알파벳 소문자, 숫자, -, _, . 확인
         for (int i = 0; i < new_id.length(); i++) {
-            if (new_id.charAt(i) == '.' || new_id.charAt(i) == '-' || new_id.charAt(i) == '_') {
-                temp += new_id.charAt(i) + "";
+            char cur = new_id.charAt(i);
+            
+            if (Character.isDigit(cur)) {
+                sb.append(cur);
             }
             
-            if (new_id.charAt(i) >= 'a' && new_id.charAt(i) <= 'z') {
-                temp += new_id.charAt(i) + "";
+            if (Character.isLetter(cur)) {
+                sb.append(cur);
             }
             
-            if (new_id.charAt(i) >= '0' && new_id.charAt(i) <= '9') {
-                temp += new_id.charAt(i) + "";
+            if (cur == '-' || cur == '.' || cur == '_') {
+                sb.append(cur);
             }
         }
-        System.out.println("2 " + temp);
         
-        //3. 
-        temp = temp.replaceAll("\\.+", ".");
-        System.out.println("3 " + temp);
-        
-        if (temp.length() > 0 && temp.charAt(0) == '.') {
-            temp = temp.substring(1);
-        }
-        if (temp.length() > 0 && temp.charAt(temp.length() - 1) == '.') {
-            temp = temp.substring(0, temp.length() - 1);
-        }
+        // 3. 연속된 점 제거.
+        String temp = sb.toString().replaceAll("\\.+", ".");
+        sb = new StringBuilder(temp);
 
-        System.out.println("4 " + temp);
+        // 4. 양 끝 마침표 제거.
+        if (sb.charAt(0) == '.') sb.deleteCharAt(0);
+        if (!sb.toString().isEmpty() && sb.charAt(sb.length() - 1) == '.') sb.deleteCharAt(sb.length() - 1);
         
-        if (temp.equals("")) temp = "a";
-        System.out.println("5 " + temp);
+        // 5. 비었으면 a 넣기
+        if (sb.toString().isEmpty()) sb.append("a");
         
-        if (temp.length() > 15) {
-            temp = temp.substring(0, 15);
-            while (temp.charAt(temp.length() - 1) == '.') {
-                temp = temp.substring(0, temp.length() - 1);
+        // 6. 15자 제한.
+        if (sb.length() > 15) {
+            String cutted = sb.toString().substring(0, 15);
+            sb = new StringBuilder(cutted);
+        }
+        
+        if (sb.charAt(0) == '.') sb.deleteCharAt(0);
+        if (!sb.toString().isEmpty() && sb.charAt(sb.length() - 1) == '.') sb.deleteCharAt(sb.length() - 1);
+        
+        // 7. 2자 이하면 늘리기
+        if (sb.length() <= 2) {
+            char last = sb.charAt(sb.length() - 1);
+            while (sb.length() != 3) {
+                sb.append(last);
             }
         }
-        System.out.println("6 " + temp);
         
-        if (temp.length() <= 2) {
-            while (temp.length() < 3) {
-                temp += temp.charAt(temp.length() - 1);
-            }
-        }
-        System.out.println("7 " + temp);
-        return temp;
+        // System.out.println(sb.toString());
+        
+        return sb.toString();
     }
 }
 
 /*
-3자 이상 15자 이하
-소문자, 숫자, -, _, .만 가능
-.은 처음과 끝 불가능, 연속 블가능
-
-1. 소문자화
-2. 안되는 문자 제거.
-3. 연속된 . 한개로 치환
-4. 처음과 끝 . 제거
-5. 빈문자열이면 a넣기
-6. 16자 이상이면 15자까지 줄이고 마지막 . 이면 제거
-7. 2자이하면 마지막 문자 반복해서 3자로
+조건
+- 알파벳 소문자, 숫자, -, _, . 만 사용 가능.
+- .는 처음과 끝 불가능. 연속으로 불가능.
+- 소문자로 치환.
+- 사용가능한거빼고 제거.
+- 연속된 . 하나로 치환.
+- 처음과 끝에 있는 . 제거.
+- 빈문자열에 a 넣기
+- 15자로 자르기.
+- 마침표 다시.
+- 길이 2이하면 마지막 문자를 3까지 반복.
 */
