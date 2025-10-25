@@ -1,81 +1,86 @@
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.PriorityQueue;
+import java.util.StringTokenizer;
 
 public class Main {
-
-    static int N, M;
-    static int[] dist, parent;
-    static ArrayList<ArrayList<Edge>> list = new ArrayList<>();
-
-    static class Edge implements Comparable<Edge> {
-        int b;
-        int cost;
-        public Edge(int b, int cost) {
-            this.b = b;
-            this.cost = cost;
-        }
-        @Override
-        public int compareTo(Edge o) {
-            return cost - o.cost;
-        }
-    }
-
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer st;
+        StringTokenizer st = new StringTokenizer(br.readLine());
 
-        st = new StringTokenizer(br.readLine());
-        N = Integer.parseInt(st.nextToken());
-        M = Integer.parseInt(st.nextToken());
+        int N = Integer.parseInt(st.nextToken());
+        int M = Integer.parseInt(st.nextToken());
 
-        dist = new int[N + 1];
-        parent = new int[N + 1];
-        for (int i = 1; i < N + 1; i++) {
-            dist[i] = Integer.MAX_VALUE;
+        ArrayList<ArrayList<int[]>> graph = new ArrayList<>();
+
+        for (int i = 0; i <= N; i++) {
+            graph.add(new ArrayList<>());
         }
-
-        for (int i = 0; i < N + 1; i++) {
-            list.add(new ArrayList<>());
-        }
-        dist[1] = 0;
 
         for (int i = 0; i < M; i++) {
             st = new StringTokenizer(br.readLine());
             int A = Integer.parseInt(st.nextToken());
             int B = Integer.parseInt(st.nextToken());
             int C = Integer.parseInt(st.nextToken());
-            list.get(A).add(new Edge(B, C));
-            list.get(B).add(new Edge(A, C));
+
+            graph.get(A).add(new int[]{B, C});
+            graph.get(B).add(new int[]{A, C});
         }
 
-        dijkstra();
+        PriorityQueue<int[]> pq = new PriorityQueue<>((a, b) -> a[1] - b[1]);
+        int[] dist = new int[N + 1];
+        int[] prev = new int[N + 1];
+        Arrays.fill(dist, Integer.MAX_VALUE);
 
-        ArrayList<int[]> result = new ArrayList<>();
-        for (int i = 2; i <= N; i++) {
-            result.add(new int[]{i, parent[i]});
-        }
-
-        System.out.println(result.size());
-        for (int[] edge : result) {
-            System.out.println(edge[0] + " " + edge[1]);
-        }
-    }
-
-    static void dijkstra() {
-        PriorityQueue<Edge> pq = new PriorityQueue<>();
-        pq.offer(new Edge(1, 0));
+        dist[1] = 0;
+        pq.add(new int[]{1, 0});
 
         while (!pq.isEmpty()) {
-            Edge e = pq.poll();
-            int now = e.b;
+            int[] cur = pq.poll();
+            int v = cur[0];
+            int d = cur[1];
 
-            for (Edge next : list.get(now)) {
-                if (dist[next.b] > dist[now] + next.cost) {
-                    dist[next.b] = dist[now] + next.cost;
-                    parent[next.b] = now;
-                    pq.offer(new Edge(next.b, dist[next.b]));
+            if (dist[v] < d) continue;
+
+            for (int[] next : graph.get(v)) {
+                int nv = next[0];
+                int nd = next[1];
+
+                if (dist[nv] > dist[v] + nd) {
+                    dist[nv] = dist[v] + nd;
+                    pq.add(new int[]{nv, dist[nv]});
+                    prev[nv] = v;
                 }
             }
         }
+
+        StringBuilder sb = new StringBuilder();
+        int cnt = 0;
+        for (int i = 2; i <= N; i++) {
+            if (i == 0) continue;
+            cnt++;
+            sb.append(i + " " + prev[i] + "\n");
+        }
+
+        System.out.println(cnt);
+        System.out.println(sb.toString());
     }
 }
+
+/*
+조건
+- 컴퓨터들이 서로 연결되어 있음.
+- 간선에 성능 존재.
+- 슈퍼컴퓨터는 1 -> 얘가 복구함.
+- 최소 개수 회선 선택.
+- 보안 패킷 걸리는 시간 구하기.
+
+요구
+- 복구한 회선 표시
+
+풀이
+- 다익하면서 그냥 넣으면 댐.
+ */
