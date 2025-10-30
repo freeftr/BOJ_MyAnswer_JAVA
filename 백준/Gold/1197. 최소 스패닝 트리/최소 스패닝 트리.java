@@ -1,76 +1,74 @@
-import java.util.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.PriorityQueue;
+import java.util.StringTokenizer;
+
 public class Main {
+
     static int V, E;
-    static class Node implements Comparable<Node>{
-        int from;
-        int to;
+    static int[] parent;
+
+    static class Edge{
+        int x;
+        int y;
         int cost;
-        Node(int from, int to, int cost){
-            this.from = from;
-            this.to = to;
+        Edge(int x, int y, int cost) {
+            this.x = x;
+            this.y = y;
             this.cost = cost;
         }
-
-        @Override
-        public int compareTo(Node o){
-            return this.cost - o.cost;
-        }
-
     }
-    static ArrayList<Node> list;
-    static int[] parents;
-    public static void main(String[] args) throws IOException{
+
+    public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
         StringTokenizer st = new StringTokenizer(br.readLine());
+
         V = Integer.parseInt(st.nextToken());
         E = Integer.parseInt(st.nextToken());
-        parents = new int[V+1];
-        list = new ArrayList<>();
-        for(int i = 0; i < E; i++){
-            st = new StringTokenizer(br.readLine());
-            int from = Integer.parseInt(st.nextToken());
-            int to = Integer.parseInt(st.nextToken());
-            int cost = Integer.parseInt(st.nextToken());
-            list.add(new Node(from, to , cost));
-        }
-        Collections.sort(list);
-        for(int i = 1; i <= V; i++){
-            parents[i] = i;
+
+        parent = new int[V + 1];
+
+        for (int i = 1; i <= V; i++) {
+            parent[i] = i;
         }
 
-        int sum=0;
-        for(Node node : list){
-            int from = node.from;
-            int to = node.to;
-            int cost = node.cost;
-            if(find(from)!=find(to)){
-                union(from,to);
-                sum+=cost;
-            }
+        PriorityQueue<Edge> pq = new PriorityQueue<>((a, b) -> a.cost - b.cost);
+        long sum = 0;
+        int cnt = 0;
+
+        for (int i = 0; i < E; i++) {
+            st = new StringTokenizer(br.readLine());
+            int a = Integer.parseInt(st.nextToken());
+            int b = Integer.parseInt(st.nextToken());
+            int c = Integer.parseInt(st.nextToken());
+
+            pq.add(new Edge(a, b, c));
         }
-//        System.out.println();
-//        for(int i = 1; i <= V; i++){
-//            System.out.printf("i: %d p: %d     ", i, parents[i]);
-//        }
+
+        while (!pq.isEmpty()) {
+            Edge e = pq.poll();
+
+            if (find(e.x) != find(e.y)) {
+                union(e.x, e.y);
+                sum += e.cost;
+                cnt++;
+            }
+
+            if (cnt == V - 1) break;
+        }
+
         System.out.println(sum);
     }
-    //  find 부모 찾기 알고리즘
-    public static int find(int v){
-        if(parents[v]==v){
-            return v;
-        }
-        return parents[v] = find(parents[v]);
+
+    static int find(int v) {
+        if (v == parent[v]) return v;
+        return parent[v] = find(parent[v]);
     }
-    public static void union(int a, int b){
+
+    static void union(int a, int b) {
         a = find(a);
         b = find(b);
-        if(a<b){
-            parents[b] = a;
-        }
-        else{
-            parents[a] = b;
-        }
+        parent[a] = b;
     }
 }
