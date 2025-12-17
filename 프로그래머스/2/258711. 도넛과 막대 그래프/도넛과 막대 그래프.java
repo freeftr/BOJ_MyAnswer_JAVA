@@ -1,53 +1,84 @@
-import java.util.*;
 class Solution {
     public int[] solution(int[][] edges) {
-        int[] answer = {};
-        int[] in = new int[1000001];
-        int[] out = new int[1000001];
-        HashSet<Integer> nodes = new HashSet<>();
+        int[] answer = new int[4];
+        
+        // 정점 개수 구하기
+        int N = 0;
+        for (int[] edge : edges) {
+            int from = edge[0];
+            int to = edge[1];
+            
+            N = Math.max(N, from);
+            N = Math.max(N, to);
+        }
+        
+        int[] indep = new int[N + 1];
+        int[] outdep = new int[N + 1];
         
         for (int[] edge : edges) {
-            in[edge[1]]++;
-            out[edge[0]]++;
+            int from = edge[0];
+            int to = edge[1];
             
-            nodes.add(edge[0]);
-            nodes.add(edge[1]);
+            indep[to]++;
+            outdep[from]++;
         }
         
-        answer = new int[4];
-        for (int node : nodes) {
-            if (in[node] == 0 && out[node] >= 2) {
-                answer[0] = node;
+        // for (int i = 1; i <= N; i++) {
+        //     System.out.println("idx:" + i + " in:" + indep[i] + " out:" + outdep[i]);
+        // }
+        
+        int line = 0;
+        int donut = 0;
+        int eight = 0;
+        int v = 0;
+        int max = 0;
+        
+        for (int i = 0; i <= N; i++) {
+            int in = indep[i];
+            int out = outdep[i];
+            
+            if (in >= 1 && out == 0) {
+                line++;
+                continue;
             }
-            if (in[node] >= 1 && out[node] == 0) {
-                answer[2]++;
+            
+            if (in == 0) {
+                if (max < out) {
+                    max = out;
+                    v = i;
+                }
+                continue;
             }
-            if (in[node] >= 2 && out[node] >= 2) {
-                answer[3]++;
+            
+            if (in >= 2 && out >= 2) {
+                eight++;
+                continue;
             }
         }
         
-        answer[1] = out[answer[0]] - answer[2] - answer[3];
+        donut = max - line - eight;
+        
+        answer[0] = v;
+        answer[1] = donut;
+        answer[2] = line;
+        answer[3] = eight;
+        
         return answer;
     }
 }
 
 /*
 조건
-- 도넛: 다시 원래 정점 돌아옴.
-- 막대: 다시 안돌아옴.
-- 팔자: 도넛 두개 연결.
+- 도넛, 막대, 8자
+- 단방향 그래프
+- 도넛 = n개의 정점 + n개의 간선
 
 요구
-- 정점
-- 도넛 수
-- 막대 수
-- 팔자 수
+- 정점 번호, 도넛, 막대, 8자 개수 구하기
 
 풀이
-- 각 정점의 나가는 간선 수와 들어오는 간선 수 비교
-- 정점: 나가는 간선만 존재.
-- 도넛: 정점의 out - 막대 - 팔자
-- 막대: out = 1 in = 1
-- 팔자: out = 2 in = 2
+- 정점번호 = indep == 0 && outdep > 0
+- 막대 = indep == 1 && outdep == 1
+- 8자 = indep >= 2 && outdep >= 2
+- 도넛 = 정점에서 나가는 간선 - 막대 - 8자
 */
