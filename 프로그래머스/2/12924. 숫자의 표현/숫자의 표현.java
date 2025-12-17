@@ -1,23 +1,23 @@
 class Solution {
     public int solution(int n) {
         int answer = 0;
-        int[] arr = new int[n + 1];
-        
-        for (int i = 1; i <= n; i++) {
-            arr[i] = arr[i - 1] + i;
-        }
-        
-        int left = 0;
+        int left = 1;
         int right = 1;
+        int sum = 1;
         
-        while(left <= right && right <= n) {
-            int now = arr[right] - arr[left];
-            if (now == n) {
-                answer++;
+        while (right <= n) {
+            if (sum < n) {
                 right++;
+                
+                sum += right;
+            } else if (sum == n) {
+                answer++;
+                sum -= left;
+                left++;
+            } else {
+                sum -= left;
+                left++;
             }
-            if (now > n) left++;
-            if (now < n) right++;
         }
         
         return answer;
@@ -26,11 +26,11 @@ class Solution {
 
 /*
 조건
-- n을 연속한 자연수로 표현
+- 자연수 n을 연속된 자연수의 합으로 표현
 
 요구
-- 경우의 수
+- 연속된 자연수의 합으로 표현하는 방법
 
 풀이
-- 누적합
+- 투포인터?
 */
