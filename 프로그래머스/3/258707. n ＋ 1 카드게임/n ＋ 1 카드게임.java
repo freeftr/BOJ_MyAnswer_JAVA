@@ -1,75 +1,104 @@
 import java.util.*;
+
 class Solution {
+    
+    static int n = 0;
+    static int idx;
+    static ArrayList<Integer> inhand = new ArrayList<>();
+    static ArrayList<Integer> drawed = new ArrayList<>();
+    
     public int solution(int coin, int[] cards) {
         int answer = 0;
-        int N = cards.length;
-        ArrayList<Integer> hold = new ArrayList<>();
-        ArrayList<Integer> hand = new ArrayList<>();
-        int idx = 0;
-        for (int i = 0; i < N / 3; i++) {
-            hand.add(cards[i]);
+        
+        n = cards.length;
+        
+        for (int i = 0; i < n / 3; i++) {
+            inhand.add(cards[i]);
         }
         
-        idx = N / 3;
-        int turn = 1;
+        idx = n / 3;
         
-        while (idx < N) {
-            if (idx < N) hold.add(cards[idx++]);
-            if (idx < N) hold.add(cards[idx++]);
+        while (true) {
+            if (idx >= cards.length) break;
             
-            boolean free = false;
-            for (int i = 0; i < hand.size(); i++) {
-                int a = hand.get(i);
-                int b = N + 1 - a;
-                if (hand.contains(b)) {
-                    free = true;
-                    hand.remove(Integer.valueOf(a));
-                    hand.remove(Integer.valueOf(b));
-                    break;
-                }
-            }
-            if (free) {
-                turn++;
+            draw(cards);
+            
+            if (zero()) {
+                answer++;
                 continue;
             }
             
-            boolean one = false;
-            for (int i = 0; i < hand.size(); i++) {
-                int a = hand.get(i);
-                int b = N + 1 - a;
-                if (coin >= 1 && hold.contains(b)) {
-                    one = true;
-                    hand.remove(Integer.valueOf(a));
-                    hold.remove(Integer.valueOf(b));
-                    break;
-                }
-            }
-            if (one) {
+            if (coin > 0 && one()) {
+                answer++;
                 coin--;
-                turn++;
                 continue;
             }
             
-            boolean two = false;
-            for (int i = 0; i < hold.size(); i++) {
-                int a = hold.get(i);
-                int b = N + 1 - a;
-                if (coin >= 2 && hold.contains(b)) {
-                    two = true;
-                    hold.remove(Integer.valueOf(a));
-                    hold.remove(Integer.valueOf(b));
-                    break;
-                }
-            }
-            if (two) {
+            if (coin > 1 && two()) {
+                answer++;
                 coin -= 2;
-                turn++;
                 continue;
             }
             
             break;
         }
         
-        return turn;
+        return answer + 1;
+    }
+    
+    static void draw(int[] cards) {
+        for (int i = 0; i < 2; i++) {
+            if (idx >= cards.length) return;
+            drawed.add(cards[idx++]);
+        }
+    }
+    
+    static boolean zero() {
+        for (int i = 0; i < inhand.size() - 1; i++) {
+            for (int j = i + 1; j < inhand.size(); j++) {
+                int a = inhand.get(i);
+                int b = inhand.get(j);
+                
+                if (a + b == n + 1) {
+                    inhand.remove(inhand.indexOf(a));
+                    inhand.remove(inhand.indexOf(b));
+                    return true;
+                }
+            }
+        }
+        
+        return false;
+    }
+    
+    static boolean one() {
+        for (int i = 0; i < inhand.size(); i++) {
+            int a = inhand.get(i);
+            
+            if (drawed.contains(n + 1 - a)) {
+                int b = n + 1 - a;
+                
+                drawed.remove(drawed.indexOf(b));
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    static boolean two() {
+        for (int i = 0; i < drawed.size() - 1; i++) {
+            for (int j = i + 1; j < drawed.size(); j++) {
+                int a = drawed.get(i);
+                int b = drawed.get(j);
+                
+                if (a + b == n + 1) {
+                    drawed.remove(drawed.indexOf(a));
+                    drawed.remove(drawed.indexOf(b));
+                    return true;
+                }
+            }
+        }
+        
+        return false;
     }
 }
