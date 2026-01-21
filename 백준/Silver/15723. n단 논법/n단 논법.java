@@ -1,61 +1,42 @@
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.HashMap;
 
 public class Main {
-    static int N, M;
-    static boolean check;
-    static ArrayList<ArrayList<Integer>> graph = new ArrayList<>();
-    static boolean[] visited;
-
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer st;
 
-        N = Integer.parseInt(br.readLine());
+        int n = Integer.parseInt(br.readLine());
+        HashMap<String, String> info = new HashMap<>();
 
-        for (int i = 0; i < 26; i++) {
-            graph.add(new ArrayList<>());
+        for (int i = 0; i < n; i++) {
+            String[] s = br.readLine().split(" is ");
+            info.put(s[0], s[1]);
         }
 
-        for (int i = 0; i < N; i++) {
-            String s = br.readLine();
-            char from = s.charAt(0);
-            char to = s.charAt(5);
-            graph.get(from - 'a').add(to - 'a');
-        }
+        StringBuilder sb = new StringBuilder();
+        int m = Integer.parseInt(br.readLine());
 
-        M = Integer.parseInt(br.readLine());
+        for (int i = 0; i < m; i++) {
+            String[] s = br.readLine().split(" is ");
+            String a = s[0];
+            String b = s[1];
 
-        for (int i = 0; i < M; i++) {
-            String s = br.readLine();
-            char from = s.charAt(0);
-            char to = s.charAt(5);
+            boolean ok = false;
 
-            visited = new boolean[26];
-            check = false;
+            while (info.containsKey(a)) {
+                a = info.get(a);
 
-            dfs(from - 'a', to - 'a');
-
-            if (check) {
-                System.out.println("T");
-            } else {
-                System.out.println("F");
+                if (a.equals(b)) {
+                    ok = true;
+                    break;
+                }
             }
-        }
-    }
 
-    static void dfs(int v, int target) {
-        if (v == target) {
-            check = true;
-            return;
+            sb.append(ok ? "T" : "F").append('\n');
         }
 
-        visited[v] = true;
-
-        for (int nv : graph.get(v)) {
-            if (!visited[nv]) {
-                dfs(nv, target);
-            }
-        }
+        System.out.print(sb);
     }
 }
