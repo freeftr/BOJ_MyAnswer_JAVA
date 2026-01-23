@@ -1,100 +1,111 @@
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayDeque;
+import java.util.Queue;
+import java.util.StringTokenizer;
+
 public class Main {
     static int N, M;
-    static int[][] sea;
-    public static void main(String[] args) throws IOException{
+    static int[][] map;
+    static int[] dx = {0, 0, 1, -1};
+    static int[] dy = {1, -1, 0, 0};
+
+    public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
         StringTokenizer st = new StringTokenizer(br.readLine());
+
         N = Integer.parseInt(st.nextToken());
         M = Integer.parseInt(st.nextToken());
-        sea = new int[N][M];
-        for(int i = 0; i < N; i++){
+
+        map = new int[N][M];
+        for (int i = 0; i < N; i++) {
             st = new StringTokenizer(br.readLine());
-            for(int j = 0; j < M; j++){
-                sea[i][j] = Integer.parseInt(st.nextToken());
+            for (int j = 0; j < M; j++) {
+                map[i][j] = Integer.parseInt(st.nextToken());
             }
         }
+
         int year = 0;
-        while(true){
-            year++;
-            int cnt = 0;
+        while (true) {
+            int comp = countComponent();
+
+            if (comp >= 2) {
+                System.out.println(year);
+                return;
+            }
+            if (comp == 0) {
+                System.out.println(0);
+                return;
+            }
+
             melt();
-            boolean[][] visited = new boolean[N][M];
-            for(int i = 0; i < N; i++){
-                for(int j = 0; j < M; j++){
-                    if(sea[i][j] > 0 && !visited[i][j]){
-                        bfs(i,j, visited);
-                        cnt++;
+            year++;
+        }
+    }
+
+    static int countComponent() {
+        boolean[][] visited = new boolean[N][M];
+        int cnt = 0;
+
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < M; j++) {
+                if (map[i][j] == 0) continue;
+                if (visited[i][j]) continue;
+
+                cnt++;
+                if (cnt >= 2) return cnt;
+
+                Queue<int[]> q = new ArrayDeque<>();
+                q.add(new int[]{i, j});
+                visited[i][j] = true;
+
+                while (!q.isEmpty()) {
+                    int[] cur = q.poll();
+                    int x = cur[0];
+                    int y = cur[1];
+
+                    for (int k = 0; k < 4; k++) {
+                        int nx = x + dx[k];
+                        int ny = y + dy[k];
+
+                        if (nx < 0 || ny < 0 || nx >= N || ny >= M) continue;
+                        if (visited[nx][ny]) continue;
+                        if (map[nx][ny] == 0) continue;
+
+                        visited[nx][ny] = true;
+                        q.add(new int[]{nx, ny});
                     }
                 }
             }
-            if(!check()){
-                System.out.println(0);
-                break;
-            }
-            if(cnt>=2){
-                System.out.println(year);
-                break;
-            }
         }
+
+        return cnt;
     }
-    public static void melt(){
-        int[][] zeroice = new int[N][M];
-        for(int i = 0; i < N; i++){
-            for(int j = 0; j < M; j++){
-                int zero=0;
-                if(i + 1 < N && sea[i+1][j] <= 0){
-                    zero++;
+
+    static void melt() {
+        int[][] dec = new int[N][M];
+
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < M; j++) {
+                if (map[i][j] == 0) continue;
+
+                int sea = 0;
+                for (int k = 0; k < 4; k++) {
+                    int nx = i + dx[k];
+                    int ny = j + dy[k];
+                    if (nx < 0 || ny < 0 || nx >= N || ny >= M) continue;
+                    if (map[nx][ny] == 0) sea++;
                 }
-                if(j + 1 < M && sea[i][j+1] <= 0){
-                    zero++;
-                }
-                if(i - 1 >= 0 && sea[i-1][j] <= 0){
-                    zero++;
-                }
-                if(j - 1 >= 0 && sea[i][j-1] <= 0){
-                    zero++;
-                }
-                zeroice[i][j] = zero;
+                dec[i][j] = sea;
             }
         }
-        for(int i = 0; i < N; i++){
-            for(int j = 0; j < M; j++){
-                sea[i][j] -= zeroice[i][j];
-            }
-        }
-    }
-    public static boolean check(){
-        for(int i = 0; i < N; i++){
-            for(int j = 0; j < M; j++){
-                if(sea[i][j] > 0){
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-    public static void bfs(int x, int y, boolean[][] visited){
-        Queue<int[]> q = new LinkedList<>();
-        int[] dx = {-1, 0, 1, 0};
-        int[] dy = {0, -1, 0, 1};
-        q.add(new int[]{x, y});
-        visited[x][y] = true;
-        while(!q.isEmpty()){
-            int[] arr = q.poll();
-            int X = arr[0];
-            int Y = arr[1];
-            for(int i = 0; i < 4; i++){
-                int nx = X + dx[i];
-                int ny = Y + dy[i];
-                if(nx>=0 && ny>=0 && nx < N && ny < M && !visited[nx][ny] &&sea[nx][ny] > 0){
-                    q.add(new int[]{nx, ny});
-                    visited[nx][ny] = true;
-                }
+
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < M; j++) {
+                if (map[i][j] == 0) continue;
+                map[i][j] = Math.max(0, map[i][j] - dec[i][j]);
             }
         }
     }
 }
-
