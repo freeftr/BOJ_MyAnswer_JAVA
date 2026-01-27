@@ -1,128 +1,146 @@
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.StringTokenizer;
 
 public class Main {
 
     static int R, C, T;
-    static int[][] map;
-    static int upX = 0, upY = 0;
-    static int downX = 0, downY = 0;
-
-    static int[] dx = {-1, 0, 1, 0};
-    static int[] dy = {0, -1, 0, 1};
-
-    static ArrayList<int[]> dusts = new ArrayList<>();
+    static int[][] board;
+    static int r = -1, c = -1;
+    static int[] dx = {0, 0, 1, -1};
+    static int[] dy = {1, -1, 0, 0};
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer st;
-
-        st = new StringTokenizer(br.readLine());
+        StringTokenizer st = new StringTokenizer(br.readLine());
 
         R = Integer.parseInt(st.nextToken());
         C = Integer.parseInt(st.nextToken());
         T = Integer.parseInt(st.nextToken());
 
-        map = new int[R][C];
+        board = new int[R + 1][C + 1];
 
-        boolean first = true;
-        for (int i = 0; i < R; i++) {
+        for (int i = 1; i <= R; i++) {
             st = new StringTokenizer(br.readLine());
-            for (int j = 0; j < C; j++) {
-                map[i][j] = Integer.parseInt(st.nextToken());
-                if (map[i][j] > 0) {
-                    dusts.add(new int[]{i,j});
-                }
-                if( map[i][j]==-1 ) {
-                    if(first) {
-                        first = false;
-                        upX = i;
-                        upY = j;
-                    } else {
-                        downX = i;
-                        downY = j;
-                    }
+            for (int j = 1; j <= C; j++) {
+                board[i][j] = Integer.parseInt(st.nextToken());
+                if (board[i][j] == -1) {
+                    r = i;
+                    c = j;
                 }
             }
         }
-        for (int i = 0; i < T; i++) {
+
+        for (int t = 0; t < T; t++) {
             expansion();
-            airClean();
+            activate();
         }
-        System.out.println(check());
+
+        System.out.println(calculate());
+    }
+
+    static void activate() {
+        for (int x = r - 1; x >= 2; x--) {
+            board[x][1] = board[x - 1][1];
+        }
+
+        for (int y = 1; y <= C - 1; y++) {
+            board[1][y] = board[1][y + 1];
+        }
+
+        for (int x = 1; x <= r - 2; x++) {
+            board[x][C] = board[x + 1][C];
+        }
+
+        for (int y = C; y >= 2; y--) {
+            board[r - 1][y] = board[r - 1][y - 1];
+        }
+
+        for (int x = r; x <= R - 1; x++) {
+            board[x][1] = board[x + 1][1];
+        }
+
+        for (int y = 1; y <= C - 1; y++) {
+            board[R][y] = board[R][y + 1];
+        }
+
+        for (int x = R; x >= r + 1; x--) {
+            board[x][C] = board[x - 1][C];
+        }
+
+        for (int y = C; y >= 2; y--) {
+            board[r][y] = board[r][y - 1];
+        }
+
+        board[r - 1][2] = 0;
+        board[r][2] = 0;
+
+        board[r - 1][1] = -1;
+        board[r][1] = -1;
     }
 
     static void expansion() {
-        int[][] tempMap = new int[R][C];
+        int[][] temp = new int[R + 1][C + 1];
 
-        for (int i = 0; i < R; i++) {
-            for (int j = 0; j < C; j++) {
-                if (map[i][j] > 0) {
+        for (int i = 1; i <= R; i++) {
+            for (int j = 1; j <= C; j++) {
+                if (board[i][j] > 0) {
+                    int A = board[i][j];
                     int cnt = 0;
-                    for (int d = 0; d < 4; d++) {
-                        int nx = i + dx[d], ny = j + dy[d];
-                        if (nx >= 0 && ny >= 0 && nx < R && ny < C && map[nx][ny] != -1) {
-                            tempMap[nx][ny] += map[i][j]/5;
-                            cnt++;
-                        }
+
+                    for (int k = 0; k < 4; k++) {
+                        int nx = i + dx[k];
+                        int ny = j + dy[k];
+
+                        if (checkRange(nx, ny)) continue;
+                        if (board[nx][ny] == -1) continue;
+
+                        cnt++;
+                        temp[nx][ny] += A / 5;
                     }
-                    tempMap[i][j] -= map[i][j]/5 * cnt;
+
+                    temp[i][j] += A - (A / 5) * cnt;
                 }
             }
         }
 
-        for (int i = 0; i < R; i++) {
-            for (int j = 0; j < C; j++) {
-                map[i][j] += tempMap[i][j];
-            }
-        }
-    }
-
-
-    //위쪽은 시계방향으로 확인
-    //아래쪽은 반시계방향으로 확인
-    static void airClean() {
-        for (int i = upX - 1; i > 0; i--){
-            map[i][0] = map[i - 1][0];
-        }
-        for (int i = 0; i < C - 1; i++){
-            map[0][i] = map[0][i + 1];
-        }
-        for (int i = 0; i < upX; i++) {
-            map[i][C - 1] = map[i + 1][C - 1];
-        }
-        for (int i = C - 1; i > 1; i--) {
-            map[upX][i] = map[upX][i - 1];
-        }
-        map[upX][1] = 0;
-
-        for (int i = downX + 1; i < R - 1; i++) {
-            map[i][0] = map[i + 1][0];
-        }
-        for (int i = 0; i < C - 1; i++){
-            map[R - 1][i] = map[R - 1][i + 1];
-        }
-        for (int i = R - 1; i > downX; i--) {
-            map[i][C - 1] = map[i - 1][C - 1];
-        }
-        for (int i = C - 1; i > 1; i--) {
-            map[downX][i] = map[downX][i - 1];
-        }
-        map[downX][1] = 0;
-    }
-
-
-
-    static int check(){
-        int cnt = 0;
-        for (int i = 0; i < R; i++) {
-            for (int j = 0; j < C; j++) {
-                if (map[i][j]>0){
-                    cnt+=map[i][j];
-                }
+        for (int i = 1; i <= R; i++) {
+            for (int j = 1; j <= C; j++) {
+                board[i][j] = temp[i][j];
             }
         }
 
-        return cnt;
+        board[r - 1][1] = -1;
+        board[r][1] = -1;
+    }
+
+    static int calculate() {
+        int sum = 0;
+        for (int i = 1; i <= R; i++) {
+            for (int j = 1; j <= C; j++) {
+                if (board[i][j] > 0) sum += board[i][j];
+            }
+        }
+        return sum;
+    }
+
+    static boolean checkRange(int x, int y) {
+        return x <= 0 || y <= 0 || x > R || y > C;
     }
 }
+
+
+/*
+조건
+- 1-based
+1. 먼지 확산: 인접 네 방향 => + A / 5, 기존 칸 => A / 5
+    - 동시에 일어난다.
+    - 공청있는 부분은 제외
+2. 작동: 위쪽은 반시계, 아래쪽은 시계
+    - 바람 방향대로 1칸씩 이동
+    - 공청으로 들어간 미세먼지는 제거
+
+요구
+- T초 후 남아있는 미세먼지 양 구하기
+ */
