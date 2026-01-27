@@ -1,60 +1,75 @@
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.StringTokenizer;
 
-public class Main{
+public class Main {
+
+    static int N, K, D;
+
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
 
-        int N = Integer.parseInt(st.nextToken());
-        int K = Integer.parseInt(st.nextToken());
-        int D = Integer.parseInt(st.nextToken());
+        N = Integer.parseInt(st.nextToken());
+        K = Integer.parseInt(st.nextToken());
+        D = Integer.parseInt(st.nextToken());
 
-        int[][] rules = new int[K][3];
-
+        ArrayList<int[]> rules = new ArrayList<>();
         for (int i = 0; i < K; i++) {
             st = new StringTokenizer(br.readLine());
+            int A = Integer.parseInt(st.nextToken());
+            int B = Integer.parseInt(st.nextToken());
+            int C = Integer.parseInt(st.nextToken());
 
-            rules[i][0] = Integer.parseInt(st.nextToken());
-            rules[i][1] = Integer.parseInt(st.nextToken());
-            rules[i][2] = Integer.parseInt(st.nextToken());
+            rules.add(new int[]{A, B, C});
         }
 
-        int left = 0;
-        int right = N;
         int answer = 0;
-        while (left <= right) {
-            int mid = (left + right) / 2;
+        int low = 1;
+        int high = N;
+        while (low <= high) {
+            int mid = (low + high) / 2;
 
-            if (check(mid, K, rules, D)) {
+            if (check(mid, rules, D)) {
                 answer = mid;
-                right = mid - 1;
+                high = mid - 1;
             } else {
-                left = mid + 1;
+                low = mid + 1;
             }
         }
 
         System.out.println(answer);
     }
 
-    static boolean check(int mid, int K, int[][] rules, int D) {
-        int result = 0;
-        for (int i = 0; i < K; i++) {
-            if (mid < rules[i][0]) continue;
+    static boolean check(int mid, ArrayList<int[]> rules, int D) {
+        long sum = 0;
+        for (int[] rule : rules) {
+            int s = rule[0];
+            int e = Math.min(mid, rule[1]);
+            int d = rule[2];
 
-            int max = Math.min(rules[i][1], mid);
+            if (mid < s) continue;
 
-            int length = max - rules[i][0];
-
-            result += length / rules[i][2] + 1;
-
-
-
-            if (result >= D) {
-                return true;
-            }
+            sum += (e - s) / d + 1;
         }
 
-        return result >= D;
+        return sum >= D;
     }
 }
+
+/*
+조건
+- 도토리 D개 보관
+- A부터 B까지 C개 간격으로 하나씩 더 넣는다.
+- 이러한 규칙이 K개
+- 마지막 도토리가 들어가 있는 상자의 번호 구하기
+
+요구
+- 마지막 도토리가 들어가 있는 상자의 번호 구하기
+
+풀이
+- 매개 변수 탐색
+- 마지막 번호 기준으로 계산
+ */
