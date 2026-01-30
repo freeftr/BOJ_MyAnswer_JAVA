@@ -1,82 +1,80 @@
 import java.util.*;
-
 class Solution {
-    static HashMap<String, ArrayList<Integer>> map = new HashMap<>();
+    static HashMap<String, ArrayList<Integer>> result = new HashMap<>();
     
     public int[] solution(String[] info, String[] query) {
         int[] answer = new int[query.length];
         
-        
-        for (String in : info) {
-            String[] s = in.split(" ");
-            makeKey(0, s, new StringBuilder());
-        }
-        
-        for (String key : map.keySet()) {
-            Collections.sort(map.get(key));
+        for (String f : info) {
+            String[] temp = f.split(" ");
+            dfs(0, temp, new StringBuilder());
         }
         
         int idx = 0;
+        
+        for (String key : result.keySet()) {
+            Collections.sort(result.get(key));
+        }
+        
         for (String q : query) {
-            StringBuilder sb = new StringBuilder();
-            String[] s = q.split(" ");
-            int score = Integer.parseInt(s[s.length - 1]);
-                
-            for (int i = 0; i < s.length - 1; i++) {
-                if (s[i].equals("and")) continue;
-                sb.append(s[i]);
-            }
+            String a = q.replaceAll("and ", "");
+            String[] temp = a.split(" ");
+            StringBuilder key = new StringBuilder();
             
-            ArrayList<Integer> scores = map.get(sb.toString());
+            for (int i = 0; i < temp.length - 1; i++) key.append(temp[i]);
             
-            if (scores == null) {
+            int target = Integer.parseInt(temp[4]);
+            
+            ArrayList<Integer> candidates = result.get(key.toString());
+            
+            if (candidates == null) {
                 answer[idx++] = 0;
                 continue;
             }
             
             int left = 0;
-            int right = scores.size();
+            int right = candidates.size();
             
             while (left < right) {
                 int mid = (left + right) / 2;
                 
-                if (scores.get(mid) >= score) {
+                if (candidates.get(mid) >= target) {
                     right = mid;
                 } else {
                     left = mid + 1;
                 }
             }
             
-            answer[idx++] = scores.size() - left;
+            answer[idx++] = candidates.size() - left;
         }
         return answer;
     }
     
-    static void makeKey(int depth, String[] s, StringBuilder cur) {
+    public void dfs(int depth, String[] info, StringBuilder cur) {
         if (depth == 4) {
-            int score = Integer.parseInt(s[4]);
-            map.computeIfAbsent(cur.toString(), k -> new ArrayList<>()).add(score);
+            result.computeIfAbsent(cur.toString(), k -> new ArrayList<>()).add(Integer.parseInt(info[4]));
             return;
         }
-
-        cur.append("-");
-        makeKey(depth + 1, s, cur);
-        cur.deleteCharAt(cur.length() - 1);
         
-        cur.append(s[depth]);   
-        makeKey(depth + 1, s, cur);
-        cur.setLength(cur.length() - s[depth].length());
+        int len = cur.length();
+        
+        cur.append(info[depth]);
+        dfs(depth + 1, info, cur);
+        cur.setLength(len);
+        
+        cur.append("-");
+        dfs(depth + 1, info, cur);
+        cur.setLength(len);
     }
-
 }
 
 /*
 조건
-- 항목: 언어, 직무, 경력, 음식
-- 항목을 가지고 몇점이상 맞은 사람이 몇명인지 구하는 것.
+- 언어, 직군, 경력, 소울푸드 네가지 항목 + 코테 점수
+
+요구
+- 쿼리에 맞게 리턴해라
 
 풀이
-- 항목들을 그대로 집어넣음 문자열로
-- <항목문자열, 점수들>
-- 점수들을 이분탐색.
+- 각 항목을 다 잘라서 만들수 있는 스트링을 키로 점수 다 때려박음.
 */
