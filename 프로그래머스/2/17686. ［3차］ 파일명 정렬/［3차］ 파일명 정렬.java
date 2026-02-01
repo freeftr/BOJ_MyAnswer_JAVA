@@ -1,82 +1,75 @@
 import java.util.*;
 
 class Solution {
-    public String[] solution(String[] files) {
-        int len = files.length;
-        
-        String[] answer = new String[len];
-        PriorityQueue<File> words = new PriorityQueue<>((a, b) -> {
-            if (a.head.equals(b.head)) {
-                if (a.num == b.num) return a.idx - b.idx;
-                return a.num - b.num;
-            }
-            return a.head.compareTo(b.head);
-        });
-        
-        for (int i = 0; i < len; i++) {
-            String word = files[i];
-            StringBuilder sb = new StringBuilder();
-            
-            for (int j = 0; j < word.length(); j++) {
-                if (!Character.isDigit(word.charAt(j))) {
-                    sb.append(word.charAt(j));
-                } else {
-                    break;
-                }
-            }
-            
-            String head = sb.toString();
-            sb = new StringBuilder();
-            head = head.toUpperCase();
-            String temp = word.substring(head.length());
-            int limit = Math.min(5, temp.length());
-            
-            for (int j = 0; j < limit; j++) {
-                if (Character.isDigit(temp.charAt(j))) {
-                    sb.append(temp.charAt(j));
-                } else {
-                    break;
-                }
-            }
-            
-            int number = Integer.parseInt(sb.toString());
-            
-            words.add(new File(i, head, number));
-            
-            // System.out.println(head + " " + number);
-        }
-        
-        int idx = 0;
-        while (!words.isEmpty()) {
-            answer[idx++] = files[words.poll().idx];
-        }
-        
-        return answer;
-    }
-    
-    static class File {
+    static class Name{
         int idx;
         String head;
-        int num;
+        String number;
         
-        File(int idx, String head, int num) {
+        Name (int idx, String head, String number) {
             this.idx = idx;
             this.head = head;
-            this.num = num;
+            this.number = number;
         }
+    }
+    public String[] solution(String[] files) {
+        String[] answer = new String[files.length];
+        
+        ArrayList<Name> result = new ArrayList<>();
+        
+        int idx = 0;
+        for (String file : files) {
+            StringBuilder head = new StringBuilder();
+            StringBuilder number = new StringBuilder();
+            for (int i = 0; i < file.length(); i++) {
+                char cur = file.charAt(i);
+                
+                if (cur == '.') break;
+                if (number.length() == 5) break;
+                
+                if (Character.isDigit(cur)) number.append(cur);
+                else {
+                    if (number.length() == 0) {  
+                        head.append(cur);
+                    }
+                }
+                
+            }
+            
+            String h = head.toString().toLowerCase();
+            String n = number.toString();
+            
+            result.add(new Name(idx++, h, n));
+        }
+        
+        Collections.sort(result, (a, b) -> {
+            if (a.head.equals(b.head)) {
+                if (Integer.parseInt(a.number) == Integer.parseInt(b.number)) {
+                    return a.idx - b.idx;
+                }
+                return Integer.parseInt(a.number) - Integer.parseInt(b.number);
+            }
+           return a.head.compareTo(b.head); 
+        });
+        
+        for (int i = 0; i < result.size(); i++) {
+            Name n = result.get(i);
+            answer[i] = files[n.idx];
+        }
+        return answer;
     }
 }
 
 /*
 조건
-- 파일명에 포함된 숫자를 반영한 정렬 기능 구현.
-- HEAD: 문자로 구성.
-- NUMBER: 1~5길이의 숫자. 앞쪽에 0 올 수 있음.
-- TAIL: 나머지 부분.
-- HEAD를 기준으로 사전순 정렬. 대소문자 구문 x
-- HEAD같을 경우: NUMBER의 숫자로 정렬.
-- HEAD와 NUMBER같을 경우 원래 입력대로.
+- 파일을 이름순으로 정렬한다.
+- HEAD, NUMBER, TAIL로 구성
+- HEAD: 문자로 구성
+- NUMBER: 0 ~ 99999 0101도 가능
+- TAIL: 빈칸일 수 있고, 아무렇게나 가능
 
-풀이
-- 클래스 만들어서 정렬 그냥.
+정렬 기준
+- HEAD를 기준으로 사전순 정렬 (대소문자 구분 안함)
+- 같으면 NUMBER의 숫자 순으로 정렬
+- HEAD, NUMBER가 같을 경우 인덱스 기준으로 정렬
 */
