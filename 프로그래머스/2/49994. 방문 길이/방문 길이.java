@@ -1,45 +1,47 @@
 import java.io.*;
 import java.util.*;
-
 class Solution {
-    static int[] dx = {-1,1,0,0};
-    static int[] dy = {0,0,1,-1};
-    static HashSet<String> set = new HashSet<>();
+    static HashMap<String, int[]> d = new HashMap<>();
+    static HashSet<String> visited = new HashSet<>();
+    
     public int solution(String dirs) {
         int answer = 0;
-        String[] coms = dirs.split("");
-        int x = 0, y = 0;
-        for (String com : coms) {
-            int px = x;
-            int py = y;
-            if (com.equals("U")) {
-                x += dx[0];
-                y += dy[0];
-            } else if (com.equals("D")) {
-                x += dx[1];
-                y += dy[1];
-            } else if (com.equals("L")) {
-                x += dx[2];
-                y += dy[2];
-            } else if (com.equals("R")) {
-                x += dx[3];
-                y += dy[3];
-            }
+        
+        String[] cmds = dirs.split("");
+        
+        d.put("U", new int[]{-1, 0});
+        d.put("D", new int[]{1, 0});
+        d.put("L", new int[]{0, -1});
+        d.put("R", new int[]{0, 1});
+        
+        double x = 0;
+        double y = 0;
+        
+        for (String cmd : cmds) {
+            int[] di = d.get(cmd);
             
-            if (x < -5 || y < -5 || x > 5 || y > 5) {
-                x = px;
-                y = py;
-                continue;
-            }
-            double vx = (x + px) / 2.0;
-            double vy = (y + py) / 2.0;
-            String s = vx + "-" + vy;
+            double nx = x + di[0];
+            double ny = y + di[1];
             
-            if (!set.contains(s)) {
+            if (nx < -5 || ny < -5 || nx > 5 || ny > 5) continue;
+            
+            String temp = (double)((nx + x) / 2) + " " + (double)((ny + y) / 2);
+            if (!visited.contains(temp)) {
                 answer++;
-                set.add(s);
+                visited.add(temp);
             }
+            
+            x = nx;
+            y = ny;
         }
         return answer;
     }
 }
+
+/*
+조건
+- 지나간 길 중 캐릭터가 처음 걸어본 길의 길이 구하기
+
+풀이
+- Set으로 좌표 중간 찍어서 길 갔는지 확인.
+*/
