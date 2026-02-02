@@ -1,61 +1,62 @@
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.StringTokenizer;
 
 public class Main {
+    static int N, M;
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st = new StringTokenizer(br.readLine());
 
-	static int N, M;
-	static int[][] dist;
+        N = Integer.parseInt(st.nextToken());
+        M = Integer.parseInt(st.nextToken());
 
-	public static void main(String[] args) throws IOException {
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringTokenizer st = new StringTokenizer(br.readLine());
+        int[][] dist1 = new int[N + 1][N + 1];
+        for (int i = 0; i < N + 1; i++) {
+            Arrays.fill(dist1[i], Integer.MAX_VALUE);
+            dist1[i][i] = 0;
 
-		N = Integer.parseInt(st.nextToken());
-		M = Integer.parseInt(st.nextToken());
+        }
 
-		dist = new int[N+1][N+1];
+        for (int i = 0; i < M; i++) {
+            st = new StringTokenizer(br.readLine());
+            int a = Integer.parseInt(st.nextToken());
+            int b = Integer.parseInt(st.nextToken());
+            dist1[b][a] = 1;
+        }
 
-		for (int i = 1; i <= N; i++) {
-			Arrays.fill(dist[i], Integer.MAX_VALUE);
-		}
+        for (int k = 1; k < N + 1; k++) {
+            for (int i = 1; i < N + 1; i++) {
+                for (int j = 1; j < N + 1; j++) {
+                    if (dist1[i][k] == Integer.MAX_VALUE || dist1[k][j] == Integer.MAX_VALUE) continue;
 
-		for (int i = 0; i < M; i++) {
-			st = new StringTokenizer(br.readLine());
-			int a = Integer.parseInt(st.nextToken());
-			int b = Integer.parseInt(st.nextToken());
+                    dist1[i][j] = Math.min(dist1[i][k] + dist1[k][j], dist1[i][j]);
+                }
+            }
+        }
 
-			dist[a][b] = 1;
-		}
+        int answer = 0;
 
-		for (int k = 1; k <= N; k++) {
-			for (int i = 1; i <= N; i++) {
-				for (int j = 1; j <= N; j++) {
-					if (i==j) continue;
-					if (dist[i][k] != Integer.MAX_VALUE && dist[k][j] != Integer.MAX_VALUE) {
-						dist[i][j] = Math.min(dist[i][j], dist[i][k] + dist[k][j]);
-					}
-				}
-			}
-		}
+        for (int i = 1; i <= N; i++) {
+            int heavier = 0;
+            int lighter = 0;
 
-		int cnt = 0;
-		for (int i = 1; i <= N; i++) {
-			int heavy = 0;
-			int light = 0;
-			for (int j = 1; j <= N; j++) {
-				if (dist[i][j]!=Integer.MAX_VALUE) {
-					light++;
-				}
-				if (dist[j][i]!=Integer.MAX_VALUE) {
-					heavy++;
-				}
-			}
+            for (int j = 1; j <= N; j++) {
+                if (i == j) continue;
 
-			if (heavy > N/2 || light > N/2) {
-				cnt++;
-			}
-		}
+                if (dist1[i][j] != Integer.MAX_VALUE) heavier++;
+                if (dist1[j][i] != Integer.MAX_VALUE) lighter++;
+            }
 
-		System.out.println(cnt);
-	}
+            if (heavier > N / 2 || lighter > N / 2) {
+                answer++;
+            }
+        }
+
+        System.out.println(answer);
+
+    }
 }
