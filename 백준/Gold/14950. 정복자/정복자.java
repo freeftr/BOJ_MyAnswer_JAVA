@@ -1,70 +1,69 @@
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.PriorityQueue;
+import java.util.StringTokenizer;
 
 public class Main {
-    static int N, M, t;
-    static ArrayList<Edge> edges = new ArrayList<>();
+    static int N, M, k;
     static int[] parent;
-    public static void main(String[] args) throws IOException{
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer st;
+    static PriorityQueue<Edge> pq = new PriorityQueue<>((a, b) -> a.c - b.c);
 
-        st = new StringTokenizer(br.readLine());
+    static class Edge{
+        int u;
+        int v;
+        int c;
+
+        Edge(int u, int v, int c) {
+            this.u = u;
+            this.v = v;
+            this.c = c;
+        }
+    }
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st = new StringTokenizer(br.readLine());
+
         N = Integer.parseInt(st.nextToken());
         M = Integer.parseInt(st.nextToken());
-        t = Integer.parseInt(st.nextToken());
-
-        parent = new int[N+1];
-
-        for (int i = 0; i < N + 1; i++) {
-            parent[i] = i;
-        }
+        k = Integer.parseInt(st.nextToken());
 
         for (int i = 0; i < M; i++) {
             st = new StringTokenizer(br.readLine());
-            int from = Integer.parseInt(st.nextToken());
-            int to = Integer.parseInt(st.nextToken());
-            int cost = Integer.parseInt(st.nextToken());
-            edges.add(new Edge(from, to, cost));
+            int a = Integer.parseInt(st.nextToken());
+            int b = Integer.parseInt(st.nextToken());
+            int c = Integer.parseInt(st.nextToken());
+            pq.add(new Edge(a, b, c));
         }
 
-        Collections.sort(edges);
+        parent = new int[N + 1];
+        for (int i = 0; i <= N; i++) {
+            parent[i] = i;
+        }
 
         int cnt = 0;
         int sum = 0;
-        for (Edge edge : edges) {
-            if (find(edge.to) != find(edge.from)) {
-                union(edge.to, edge.from);
-                sum += edge.cost + cnt * t;
+        int add = 0;
+
+        while (!pq.isEmpty()) {
+            Edge e = pq.poll();
+
+            if (find(e.v) != find(e.u)) {
+                sum += e.c;
+                sum += add;
+                add += k;
                 cnt++;
+                union(e.v, e.u);
             }
-            if (cnt == N - 1) break;
         }
 
         System.out.println(sum);
-    }
 
-    static class Edge implements Comparable<Edge> {
-        int from;
-        int to;
-        int cost;
 
-        public Edge(int from, int to, int cost) {
-            this.from = from;
-            this.to = to;
-            this.cost = cost;
-        }
-
-        @Override
-        public int compareTo (Edge o) {
-            return this.cost - o.cost;
-        }
     }
 
     static int find(int v) {
-        if (v == parent[v]) {
-            return v;
-        }
+        if (v == parent[v]) return v;
         return parent[v] = find(parent[v]);
     }
 
@@ -72,8 +71,6 @@ public class Main {
         a = find(a);
         b = find(b);
 
-        if (a!=b) {
-            parent[a] = b;
-        }
+        parent[a] = b;
     }
 }
