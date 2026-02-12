@@ -1,59 +1,88 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class Main {
+
+    static class Node{
+        int key;
+        Node parent;
+        Node left;
+        Node right;
+
+        Node(int key) {
+            this.key = key;
+        }
+
+        public void setParent(Node node) {
+            this.parent = node;
+        }
+
+        public void setLeft(Node node) {
+            this.left = node;
+        }
+
+        public void setRight(Node node) {
+            this.right = node;
+        }
+    }
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        int n = Integer.parseInt(br.readLine());
-        Node root = new Node(n);
-        Node r = root;
+        List<Integer> preorder = new ArrayList<>();
+        String line;
 
-        String input;
-        while ((input = br.readLine()) != null) {
-            if (input.isEmpty()) break;
-            int value = Integer.parseInt(input);
-            Node node = new Node(value);
+        while ((line = br.readLine()) != null) {
+            if (line.isEmpty()) break;
+            preorder.add(Integer.parseInt(line));
+        }
 
-            Node cur = r;
+
+        Node root = new Node(preorder.get(0));
+
+        for (int i = 1; i < preorder.size(); i++) {
+            int key = preorder.get(i);
+
+            Node cur = root;
+
             while (true) {
-                if (value < cur.value) {
+                if (cur.key > key) {
                     if (cur.left == null) {
-                        cur.left = node;
-                        node.parent = cur;
+                        Node l = new Node(key);
+                        cur.left = l;
+                        l.setParent(cur);
                         break;
+                    } else {
+                        cur = cur.left;
                     }
-                    cur = cur.left;
                 } else {
                     if (cur.right == null) {
-                        cur.right = node;
-                        node.parent = cur;
+                        Node r = new Node(key);
+                        cur.right = r;
+                        r.setParent(cur);
                         break;
+                    } else {
+                        cur = cur.right;
                     }
-                    cur = cur.right;
                 }
             }
         }
 
-        post(r);
+        postOrder(root);
     }
 
-    static void post(Node node) {
-        if (node == null) return;
-        if (node.left != null) post(node.left);
-        if (node.right != null) post(node.right);
-        System.out.println(node.value);
-    }
-
-    static class Node {
-        Node left;
-        Node parent;
-        Node right;
-        int value;
-
-        Node(int value) {
-            this.value = value;
+    static void postOrder(Node v) {
+        if (v.left != null) {
+            postOrder(v.left);
         }
+
+        if (v.right != null) {
+            postOrder(v.right);
+        }
+
+        System.out.println(v.key);
     }
 }
