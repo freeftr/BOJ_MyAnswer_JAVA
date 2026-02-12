@@ -1,77 +1,90 @@
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.StringTokenizer;
 
 public class Main {
     static int N, M;
     static int[] parent;
-
-    public static void main(String[] args) throws IOException{
+    public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer st;
+        StringTokenizer st = new StringTokenizer(br.readLine());
 
-        st = new StringTokenizer(br.readLine());
         N = Integer.parseInt(st.nextToken());
         M = Integer.parseInt(st.nextToken());
 
-        parent = new int[N+1];
+        int answer = 0;
+
+        parent = new int[N + 1];
+
         for (int i = 0; i <= N; i++) {
             parent[i] = i;
         }
 
         st = new StringTokenizer(br.readLine());
-        int K = Integer.parseInt(st.nextToken());
-        for (int i = 0; i < K; i++) {
-            int a = Integer.parseInt(st.nextToken());
-            union(0,a);
+
+        int truthCnt = Integer.parseInt(st.nextToken());
+
+        for (int i = 0; i < truthCnt; i++) {
+            parent[Integer.parseInt(st.nextToken())] = 0;
         }
 
-        ArrayList<ArrayList<Integer>> graph = new ArrayList<>();
+        ArrayList<ArrayList<Integer>> party = new ArrayList<>();
         for (int i = 0; i < M; i++) {
-            graph.add(new ArrayList<>());
             st = new StringTokenizer(br.readLine());
-            int n = Integer.parseInt(st.nextToken());
-            for (int j = 0; j < n; j++) {
-                int a = Integer.parseInt(st.nextToken());
-                graph.get(i).add(a);
-                union(graph.get(i).get(0),a);
+
+            int comeCnt = Integer.parseInt(st.nextToken());
+            int first = 0;
+
+            party.add(new ArrayList<>());
+
+            for (int j = 0; j < comeCnt; j++) {
+                int come = Integer.parseInt(st.nextToken());
+
+                party.get(i).add(come);
+                if (j == 0) first = come;
+
+                union(first, come);
             }
         }
-//        for (int i = 0; i <= N; i++) {
-//            find(i);
-//            System.out.println("parent[" + i + "] = " + parent[i]);
-//        }
+
         int cnt = 0;
         for (int i = 0; i < M; i++) {
-            for(int j : graph.get(i)) {
-                if(find(j)==0) {
+            for (int p : party.get(i)) {
+                if (find(p) == 0) {
                     cnt++;
                     break;
                 }
             }
         }
 
-        if(K==0) {
-            System.out.println(M);
-            System.exit(0);
-        }
-        System.out.println(M-cnt);
+        System.out.println(M - cnt);
+    }
+
+    static int find(int v) {
+        if (v == parent[v]) return v;
+        return parent[v] = find(parent[v]);
     }
 
     static void union(int a, int b) {
         a = find(a);
         b = find(b);
-        if(a>b) {
+
+        if (a > b) {
             parent[a] = b;
-        }
-        else {
+        } else {
             parent[b] = a;
         }
     }
-
-    static int find(int v) {
-        if(parent[v] == v) {
-            return v;
-        }
-        return parent[v] = find(parent[v]);
-    }
 }
+
+/*
+조건
+- 지민이 구라가 들통나면 안댐
+- 들통나는 경우 => 진실을 아는 사람과 파티를 여러번 하는 경우
+
+요구
+- 파티를 갈 수 있는 최대 횟수 구하기
+ */
