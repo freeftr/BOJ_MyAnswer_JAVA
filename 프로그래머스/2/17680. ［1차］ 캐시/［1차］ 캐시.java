@@ -1,4 +1,5 @@
 import java.util.*;
+
 class Solution {
     public int solution(int cacheSize, String[] cities) {
         int answer = 0;
@@ -7,28 +8,25 @@ class Solution {
             return cities.length * 5;
         }
         
-        ArrayList<String> caches = new ArrayList<>();
+        List<String> cache = new ArrayList<>();
         
         for (String city : cities) {
             city = city.toLowerCase();
-            if (caches.contains(city)) {
+            
+            if (cache.contains(city)) {
                 answer += 1;
-                if (caches.size() < cacheSize) {
-                    caches.add(city);
-                } else {
-                    caches.remove(caches.indexOf(city));
-                    caches.add(city);  
-                }
+                cache.remove(city);
+                cache.add(city);
             } else {
                 answer += 5;
-                if (caches.size() < cacheSize) {
-                    caches.add(city);
-                } else {
-                    caches.remove(0);
-                    caches.add(city);  
+                
+                if (cache.size() == cacheSize) {
+                    cache.remove(0);
                 }
+                cache.add(city);
             }
         }
+        
         return answer;
     }
 }
