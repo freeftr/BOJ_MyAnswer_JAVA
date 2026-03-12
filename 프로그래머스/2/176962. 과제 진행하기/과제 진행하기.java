@@ -1,72 +1,78 @@
-import java.io.*;
 import java.util.*;
 
 class Solution {
-
-    static PriorityQueue<Work> workList = new PriorityQueue<>();
-
-    static class Work implements Comparable<Work> {
-        String title;
-        int start;
-        int duration;
-
-        public Work(String title, int start, int duration) {
-            this.title = title;
-            this.start = start;
-            this.duration = duration;
-        }
-
-        @Override
-        public int compareTo(Work o) {
-            return this.start - o.start;
+    static class Plan{
+        String name;
+        int remain;
+        Plan(String name, int remain) {
+            this.name = name;
+            this.remain = remain;
         }
     }
-
+    
     public String[] solution(String[][] plans) {
         String[] answer = new String[plans.length];
-
-        for (String[] plan : plans) {
-            String[] temp = plan[1].split(":");
-            String subject = plan[0];
-            int start = Integer.parseInt(temp[0]) * 60 + Integer.parseInt(temp[1]);
-            int duration = Integer.parseInt(plan[2]);
-
-            workList.add(new Work(subject, start, duration));
-        }
-
-        Stack<Work> stack = new Stack<>();
+        Arrays.sort(plans, (a, b) -> a[1].compareTo(b[1]));
+        
+        Stack<Plan> stack = new Stack<>();
+        
+        int prev = 0;
         int idx = 0;
-        Work curWork = workList.poll();
-        int time = curWork.start;
-
-        while (!workList.isEmpty()) {
-            Work nextWork = workList.peek();
-
-            if (time + curWork.duration <= nextWork.start) {
-                time += curWork.duration;
-                answer[idx++] = curWork.title;
-
+        
+        for (int i = 0; i < plans.length; i++) {
+            String name = plans[i][0];
+            int start = getTime(plans[i][1]);
+            int duration = Integer.parseInt(plans[i][2]);
+            int nStart = -1;
+            
+            if (i != plans.length - 1) {
+                nStart = getTime(plans[i + 1][1]);
+            }
+            
+            int time = nStart - start;
+            if (nStart >= start + duration) {
+                answer[idx++] = name;
+                
+                time -= duration;
+                
+                while (!stack.isEmpty() && stack.peek().remain <= time) {
+                    Plan p = stack.pop();
+                    answer[idx++] = p.name;
+                    time -= p.remain;
+                }
+                
                 if (!stack.isEmpty()) {
-                    curWork = stack.pop();
-                } else {
-                    curWork = workList.poll();
-                    time = curWork.start;
+                    stack.peek().remain -= time;
                 }
             } else {
-                curWork.duration -= (nextWork.start - time);
-                stack.push(curWork);
-                curWork = workList.poll();
-                time = curWork.start;
+                stack.push(new Plan(name, duration - time));
             }
         }
-
-        answer[idx++] = curWork.title;
-
+        
         while (!stack.isEmpty()) {
-            curWork = stack.pop();
-            answer[idx++] = curWork.title;
+            answer[idx++] = stack.pop().name;
         }
 
+        
         return answer;
     }
+    
+    static int getTime(String s) {
+        String[] temp = s.split(":");
+        int h = Integer.parseInt(temp[0]);
+        int m = Integer.parseInt(temp[1]);
+        
+        return h * 60 + m;
+    }
 }
+
+/*
+조건
+- 새로운 과제 시작 시 기존 과제 멈추고 새로운 거 시작
+
+요구
+- 과제를 끝낸 순서대로 반환
+
+풀이
+- 스택
+*/
