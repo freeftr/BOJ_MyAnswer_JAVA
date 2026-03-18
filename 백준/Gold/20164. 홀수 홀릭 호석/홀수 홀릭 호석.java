@@ -31,15 +31,13 @@ public class Main {
 
         String S = num + "";
 
-        for (int i = 0; i < len - 2; i++) {
-            for (int j = i + 1; j < len - 1; j++) {
-                for (int k = j + 1; k < len; k++) {
-                    int a = Integer.parseInt(S.substring(i, j));
-                    int b = Integer.parseInt(S.substring(j, k));
-                    int c = Integer.parseInt(S.substring(k, len));
+        for (int i = 1; i < len - 1; i++) {
+            for (int j = i + 1; j < len; j++) {
+                int a = Integer.parseInt(S.substring(0, i));
+                int b = Integer.parseInt(S.substring(i, j));
+                int c = Integer.parseInt(S.substring(j));
 
-                    dfs(a + b + c, sum);
-                }
+                dfs(a + b + c, sum);
             }
         }
     }
