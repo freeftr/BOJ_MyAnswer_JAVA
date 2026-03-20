@@ -1,69 +1,63 @@
 import java.util.*;
 
 class Solution {
-
-    static int[] dx = {1, 0, -1, 0};
-    static int[] dy = {0, 1, 0, -1};
-    static char[][] map;
-    static int rx, ry, gx, gy;
-    static int result = Integer.MAX_VALUE;
-
+    static int[] dx = {0, 0, 1, -1};
+    static int[] dy = {1, -1, 0, 0};
     public int solution(String[] board) {
-        map = new char[board.length][board[0].length()];
-
+        int answer = 0;
+        
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[0].length(); j++) {
-                map[i][j] = board[i].charAt(j);
-                if (map[i][j] == 'R') {
-                    rx = i;
-                    ry = j;
-                }
-                if (map[i][j] == 'G') {
-                    gx = i;
-                    gy = j;
+                if (board[i].charAt(j) == 'R') {
+                    answer = bfs(board, i, j);
+                    return answer;
                 }
             }
         }
-
-        bfs();
-        return result == Integer.MAX_VALUE ? -1 : result;
+        return answer;
     }
-
-    static void bfs() {
+    
+    static int bfs(String[] board, int a, int b) {
         Queue<int[]> q = new ArrayDeque<>();
-        boolean[][] visited = new boolean[map.length][map[0].length];
-        visited[rx][ry] = true;
-        q.add(new int[]{rx, ry, 0});
-
+        int N = board.length;
+        int M = board[0].length();
+        boolean[][] visited = new boolean[N][M];
+        
+        q.add(new int[]{a, b, 0});
+        visited[a][b] = true;
+        
         while (!q.isEmpty()) {
             int[] cur = q.poll();
             int x = cur[0];
             int y = cur[1];
             int dist = cur[2];
-
-            if (x == gx && y == gy) {
-                result = Math.min(result, dist);
-                continue;
-            }
-
-            for (int d = 0; d < 4; d++) {
+            
+            if (board[x].charAt(y) == 'G') return dist;
+            
+            for (int i = 0; i < 4; i++) {
                 int nx = x;
                 int ny = y;
-
-                while (true) {
-                    int tx = nx + dx[d];
-                    int ty = ny + dy[d];
-
-                    if (tx < 0 || ty < 0 || tx >= map.length || ty >= map[0].length || map[tx][ty] == 'D') break;
-                    nx = tx;
-                    ny = ty;
+                
+                while ((nx >= 0 && ny >= 0 && nx < N && ny < M) && board[nx].charAt(ny) != 'D') {
+                    nx += dx[i];
+                    ny += dy[i];
                 }
-
-                if (!visited[nx][ny]) {
-                    visited[nx][ny] = true;
-                    q.add(new int[]{nx, ny, dist + 1});
-                }
+                
+                nx -= dx[i];
+                ny -= dy[i];
+                
+                if (visited[nx][ny]) continue;
+                
+                visited[nx][ny] = true;
+                q.add(new int[]{nx, ny, dist + 1});
             }
         }
+        
+        return -1;
     }
 }
+
+/*
+조건
+- 이동 시 미끄러져서 끝으로 감
+*/
