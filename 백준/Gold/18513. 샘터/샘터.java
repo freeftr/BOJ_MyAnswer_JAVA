@@ -1,13 +1,11 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayDeque;
 import java.util.HashSet;
-import java.util.Queue;
+import java.util.PriorityQueue;
 import java.util.StringTokenizer;
 
 public class Main {
-
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
@@ -15,33 +13,38 @@ public class Main {
         int N = Integer.parseInt(st.nextToken());
         int K = Integer.parseInt(st.nextToken());
 
-        int[] ponds = new int[N];
-        int[] dir = {1,-1};
-        Queue<int[]> q = new ArrayDeque<>();
+        PriorityQueue<int[]> pq = new PriorityQueue<>((a, b) -> a[1] - b[1]);
         HashSet<Integer> visited = new HashSet<>();
 
         st = new StringTokenizer(br.readLine());
         for (int i = 0; i < N; i++) {
-            ponds[i] = Integer.parseInt(st.nextToken());
-            visited.add(ponds[i]);
-            q.add(new int[]{ponds[i], 0});
+            int a = Integer.parseInt(st.nextToken());
+
+            pq.add(new int[]{a, 0});
+            visited.add(a);
         }
 
         long answer = 0;
-        while (!q.isEmpty()) {
-            int[] cur = q.poll();
+        K += N;
+
+        while (!pq.isEmpty()) {
+            int[] cur = pq.poll();
             int v = cur[0];
             int d = cur[1];
 
-            for (int i = 0; i < 2; i++) {
-                int nv = v + dir[i];
+            K--;
+            answer += cur[1];
 
-                if (K > 0 && !visited.contains(nv)) {
-                    answer += d + 1;
-                    visited.add(nv);
-                    K--;
-                    q.add(new int[]{nv, d + 1});
-                }
+            if (K == 0) break;
+
+            if (!visited.contains(v + 1)) {
+                pq.add(new int[]{v + 1, d + 1});
+                visited.add(v + 1);
+            }
+
+            if (!visited.contains(v - 1)) {
+                pq.add(new int[]{v - 1, d + 1});
+                visited.add(v - 1);
             }
         }
 
@@ -51,15 +54,14 @@ public class Main {
 
 /*
 조건
-- 일직선 상에 N개의 샘터.
-- K채의 집을 지으려고 함.
-- 위치는 중복되지 않음.
-- 가능하면 샘터의 주변에 집들을 지어 불행도 합이 최소가 되게.
-- 불행도 = 샘터까지의 거리.
+- N개의 샘터, K채의 집
+- 불행도 : 가장 가까운 샘터까지의 거리
+- 가능한 샘터 주변에 집 지음
+
 
 요구
-- 불행도의 합의 최솟값 구하기.
+- 모든 집에 대한 불행도 합의 최솟값
 
 풀이
-- 각 샘터로부터 거리를 1씩 늘려가면 빈자리 확인?
+- 샘터 위치 큐에 다 넣고 bfs
  */
