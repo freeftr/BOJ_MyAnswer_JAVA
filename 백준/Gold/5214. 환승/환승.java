@@ -1,26 +1,10 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Queue;
-import java.util.StringTokenizer;
+import java.util.*;
 
 public class Main {
-
-    static int N, M, K;
-    static ArrayList<ArrayList<Tube>> graph = new ArrayList<>();
-
-    static class Tube {
-        ArrayList<Integer> tubes;
-        int idx;
-
-        Tube (ArrayList<Integer> tubes, int idx) {
-            this.tubes = tubes;
-            this.idx = idx;
-        }
-    }
-
+    static int N, K, M;
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
@@ -29,30 +13,21 @@ public class Main {
         K = Integer.parseInt(st.nextToken());
         M = Integer.parseInt(st.nextToken());
 
-        for (int i = 0; i <= N; i++) {
-            graph.add(new ArrayList<>());
-        }
+        HashMap<Integer, ArrayList<Integer>> tubes = new HashMap<>();
+        HashMap<Integer, ArrayList<Integer>> stations = new HashMap<>();
 
-        for (int i = 0; i < M; i++) {
+        for (int i = 1; i <= M; i++) {
             st = new StringTokenizer(br.readLine());
-            ArrayList<Integer> tubes = new ArrayList<>();
-
             for (int j = 0; j < K; j++) {
-                tubes.add(Integer.parseInt(st.nextToken()));
-            }
-
-            for (int j = 0; j < K; j++) {
-                graph.get(tubes.get(j)).add(new Tube(tubes, i));
+                int a = Integer.parseInt(st.nextToken());
+                tubes.computeIfAbsent(i, k -> new ArrayList<>()).add(a);
+                stations.computeIfAbsent(a, k -> new ArrayList<>()).add(i);
             }
         }
 
-        System.out.println(bfs());
-    }
-
-    static int bfs() {
         Queue<int[]> q = new ArrayDeque<>();
         boolean[] visited = new boolean[N + 1];
-        boolean[] visitedTubes = new boolean[M];
+        boolean[] visitedT = new boolean[M + 1];
 
         q.add(new int[]{1, 1});
         visited[1] = true;
@@ -62,28 +37,32 @@ public class Main {
             int v = cur[0];
             int d = cur[1];
 
-            if (v == N) return d;
+            if (v == N) {
+                System.out.println(d);
+                return;
+            }
 
-            for(Tube t : graph.get(v)) {
-                ArrayList<Integer> nexts = t.tubes;
-                if (visitedTubes[t.idx]) continue;
-                visitedTubes[t.idx] = true;
+            ArrayList<Integer> nTs = stations.get(v);
+            if (nTs == null) continue;
 
-                for (int nv : nexts) {
-                    if (visited[nv]) continue;
-                    visited[nv] = true;
-                    q.add(new int[]{nv, d + 1});
+            for (int nt : nTs) {
+                if (visitedT[nt]) continue;
+                visitedT[nt] = true;
+                for (int ns : tubes.get(nt)) {
+                    if (visited[ns]) continue;
+                    q.add(new int[]{ns, d + 1});
+                    visited[ns] = true;
                 }
             }
         }
-
-        return -1;
+        System.out.println(-1);
     }
 }
 
 /*
 조건
-- 하이퍼튜브를 자주탐.
-- K개를 서로 연결.
-- 1번에서 N번가는 역의 최소 개수?
+- 하이퍼튜브 : 역 K개를 연결
+
+요구
+- 1번에서 N번가는데 방문하는 최소 역 개수
  */
