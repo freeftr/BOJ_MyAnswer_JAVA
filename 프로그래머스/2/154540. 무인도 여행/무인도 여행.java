@@ -1,65 +1,80 @@
-import java.io.*;
 import java.util.*;
 
 class Solution {
-
+    static int N, M;
+    static boolean[][] visited;
     static int[] dx = {0, 0, 1, -1};
     static int[] dy = {1, -1, 0, 0};
-    static boolean[][] visited;
-    static ArrayList<Integer> result = new ArrayList<>();
-    static int row, col;
     
     public int[] solution(String[] maps) {
-        row = maps.length;
-        col = maps[0].length();
+        int[] answer = {};
         
-        visited = new boolean[row][col];
-        result.clear();
+        ArrayList<Integer> result = new ArrayList<>();
+        N = maps.length;
+        M = maps[0].length();
+        visited = new boolean[N][M];
         
-        for (int i = 0; i < row; i++) {
-            for (int j = 0; j < col; j++) {
-                if (!visited[i][j] && maps[i].charAt(j) != 'X') {
-                    int count = bfs(i, j, maps);
-                    result.add(count);
+        boolean flag = false;
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < M; j++) {
+                if (visited[i][j]) continue;
+                if (Character.isDigit(maps[i].charAt(j))) {
+                    int size = bfs(i, j, maps);
+                    flag = true;
+                    result.add(size);
                 }
             }
         }
         
-        if (result.isEmpty()) {
-            return new int[]{-1};
-        }
+        if (!flag) return new int[]{-1};
         
         Collections.sort(result);
-        return result.stream().mapToInt(Integer::intValue).toArray();
+        answer = new int[result.size()];
+        
+        for (int i = 0; i < result.size(); i++) {
+            answer[i] = result.get(i);
+        }
+        
+        return answer;
     }
     
     static int bfs(int a, int b, String[] maps) {
         Queue<int[]> q = new ArrayDeque<>();
+        
         q.add(new int[]{a, b});
         visited[a][b] = true;
         
-        int sum = 0;
+        int result = 0;
         
         while (!q.isEmpty()) {
             int[] cur = q.poll();
             int x = cur[0];
             int y = cur[1];
-            
-            sum += maps[x].charAt(y) - '0';
+            int c = maps[x].charAt(y) - '0';
+            result += c;
             
             for (int i = 0; i < 4; i++) {
                 int nx = x + dx[i];
                 int ny = y + dy[i];
                 
-                if (nx < 0 || nx >= row || ny < 0 || ny >= col) continue;
-                if (visited[nx][ny]) continue;
+                if (nx < 0 || ny < 0 || nx >= N || ny >= M) continue;
                 if (maps[nx].charAt(ny) == 'X') continue;
+                if (visited[nx][ny]) continue;
                 
                 visited[nx][ny] = true;
                 q.add(new int[]{nx, ny});
             }
         }
         
-        return sum;
+        return result;
     }
 }
+
+/*
+조건
+- 숫자는 무인도
+- 숫자는 머물 수 있는 날짜를 의미합
+
+요구
+- 각 섬에서 최대 며칠씨 머물 수 있는지 알아봄
+*/
