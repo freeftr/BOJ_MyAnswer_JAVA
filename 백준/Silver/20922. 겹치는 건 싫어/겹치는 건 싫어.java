@@ -12,16 +12,17 @@ public class Main {
         int K = Integer.parseInt(st.nextToken());
 
         int[] arr = new int[N];
+        int[] cnt = new int[100001];
+
         st = new StringTokenizer(br.readLine());
         for (int i = 0; i < N; i++) {
             arr[i] = Integer.parseInt(st.nextToken());
         }
 
-        int left = 0;
+        int left = 0, right = 0;
         int answer = 0;
-        int[] cnt = new int[100001];
 
-        for (int right = 0; right < N; right++) {
+        while (right < N) {
             cnt[arr[right]]++;
 
             while (cnt[arr[right]] > K) {
@@ -30,6 +31,7 @@ public class Main {
             }
 
             answer = Math.max(answer, right - left + 1);
+            right++;
         }
 
         System.out.println(answer);
@@ -38,8 +40,11 @@ public class Main {
 
 /*
 조건
-- 수열에서 같은 원소가 여러 개 들어 있는 수열 싫어함
-- K개 이하로 들어 있는 최장 연속 부분 수열 길이 구하기
+- 같은 원소가 K개 이하로 들어 있는 최장 연속 부분 수열 구하기
 
+요구
+- 최장 길이 구하기
 
+풀이
+- 투포인터
  */
