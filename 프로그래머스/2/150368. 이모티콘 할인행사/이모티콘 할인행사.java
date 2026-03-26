@@ -1,85 +1,76 @@
 import java.util.*;
 
 class Solution {
-    
-    static int n, m;
+    static int N;
+    static ArrayList<int[]> permuts = new ArrayList<>();
     static PriorityQueue<int[]> result = new PriorityQueue<>((a, b) -> {
-        if (b[0] == a[0]) {
-            return b[1] - a[1];
-        }
+        if (a[0] == b[0]) return b[1] - a[1];
         return b[0] - a[0];
     });
-    static int[] discountRatios = {10, 20, 30, 40};
-    
+    static int[] discountRatio = {10, 20, 30, 40};
     public int[] solution(int[][] users, int[] emoticons) {
-        int[] answer = new int[2];
-        n = users.length;
-        m = emoticons.length;
+        int[] answer = {};
         
-        makeComb(0, new int[m], users, emoticons);
+        N = emoticons.length;
         
-        answer = result.poll();
+        permut(0, new int[N]);
         
-        return answer;
+        for (int[] ps : permuts) {
+            int total = 0;
+            int plus = 0;
+            
+            for (int[] u : users) {
+                int r = u[0];
+                int max = u[1];
+                int sold = 0;
+                
+                for (int i = 0; i < N; i++) {
+                    if (ps[i] >= r) {
+                        sold += (int) (100 - ps[i]) * emoticons[i] / 100;
+                    }
+                    
+                    if (sold >= max) {
+                        plus++;
+                        sold = 0;
+                        break;
+                    }
+                }
+                
+                total += sold;
+            }
+            if (ps[0] == 30 && ps[1] == 40) {
+                System.out.println(plus + " " + total);
+            }
+            
+            result.add(new int[]{plus, total});
+        }
+        
+        return result.poll();
     }
     
-    static void makeComb(int depth, int[] selected, int[][] users, int[] emoticons) {
-        if (depth == m) {
-            calculate(selected, users, emoticons);
+    static void permut (int depth, int[] cur) {
+        if (depth == N) {
+            permuts.add(cur.clone());
             return;
         }
         
         for (int i = 0; i < 4; i++) {
-            selected[depth] = discountRatios[i];
-            makeComb(depth + 1, selected, users, emoticons);
+            cur[depth] = discountRatio[i];
+            permut(depth + 1, cur);
         }
-    }
-    
-    static void calculate(int[] ratio, int[][] users, int[] emoticons) {
-        int emPlus = 0;
-        int sum = 0;
-        
-        for (int[] user : users) {
-            int minRatio = user[0];
-            int limit = user[1];
-            int bought = 0;
-            boolean plus = false;
-            
-            for (int i = 0; i < m; i++) {
-                if (ratio[i] >= minRatio) {
-                    bought += emoticons[i] * (100 - ratio[i]) / 100;
-                }
-                
-                if (bought >= limit) {
-                    emPlus++;
-                    plus = true;
-                    break;
-                }
-            }
-            
-            if (!plus) {
-                sum += bought;
-            }
-        }
-        
-        result.add(new int[]{emPlus, sum});
     }
 }
 
 /*
 조건
-- 이모티콘 할인 행사의 목표는 다음과 같다.
-1. 임티플 가입자 최대한 늘리기
-2. 임티 판매액 최대한 늘리기
-- 할인율은 10, 20, 30, 40중 하나로 설정
-- 사용자들은 자신의 기준 이상 할인하는 임티를 전부 구매한다.
-- 합이 일정 기준이 이상이면 임티플에 가입한다.
+- 임티플 최대한, 그다음 판매액 최대한
+- 자신의 기준에 따라 일정 비율 이상 할인하는 임티 구매함.
+- 일정 가격 이상이면 모두 취소 후 임티플 가입
 
 요구
-- 행사 목적을 최대한으로 달성했을 때 임티 플 가입자, 매출액 반환
+- 최대 임티플, 최대 판매액 상황
 
 풀이
-- 구현
-1. 이모티콘 할인율 순열로 전부 구하기
-2. 유저별 기준치 확인해서 집계
+1. 할인 비율을 순열
+2. 비교해보면서 결과 구함
 */
