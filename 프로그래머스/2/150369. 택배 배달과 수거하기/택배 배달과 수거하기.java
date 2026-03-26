@@ -1,11 +1,10 @@
 class Solution {
     public long solution(int cap, int n, int[] deliveries, int[] pickups) {
         long answer = 0;
-        
         int del = 0;
         int pick = 0;
         
-        for (int i = n - 1; i >= 0; i--) {
+        for (int i = n - 1; i >=0; i--) {
             del += deliveries[i];
             pick += pickups[i];
             
@@ -14,10 +13,11 @@ class Solution {
             while (del > 0 || pick > 0) {
                 del -= cap;
                 pick -= cap;
-                cnt ++;
+                
+                cnt++;
             }
             
-            answer += (i + 1) * cnt * 2;
+            answer += (i + 1) * 2 * cnt;
         }
         
         return answer;
