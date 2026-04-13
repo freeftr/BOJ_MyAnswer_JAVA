@@ -4,79 +4,72 @@ import java.io.InputStreamReader;
 import java.util.StringTokenizer;
 
 public class Main {
-    public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringBuilder sb = new StringBuilder();
-        StringTokenizer st;
+	/*
+	조건
+	- 원형을 이어진 N개의 집
+	- 도둑은 M개의 연속된 집에서 돈을 훔침.
+	- 훔친 크기가 K 이상이면 방법장치 울림
 
-        int T = Integer.parseInt(br.readLine());
+	요구
+	- 훔칠수 있는 경우의 수
 
-        for (int tc = 0; tc < T; tc++) {
-            st = new StringTokenizer(br.readLine());
+	풀이
+	- 슬라이딩 윈도우
+	 */
+	public static void main(String[] args) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		StringTokenizer st;
+		StringBuilder sb = new StringBuilder();
 
-            int N = Integer.parseInt(st.nextToken());
-            int M = Integer.parseInt(st.nextToken());
-            int K = Integer.parseInt(st.nextToken());
+		int T = Integer.parseInt(br.readLine());
 
-            int[] houses = new int[N + 1];
-            long[] preSum = new long[2 * N + 1];
+		while(T-- > 0) {
+			st = new StringTokenizer(br.readLine());
+			int N = Integer.parseInt(st.nextToken());
+			int M = Integer.parseInt(st.nextToken());
+			int K = Integer.parseInt(st.nextToken());
 
-            st = new StringTokenizer(br.readLine());
-            for (int i = 1; i <= N; i++) {
-                houses[i] = Integer.parseInt(st.nextToken());
-            }
+			st = new StringTokenizer(br.readLine());
+			int[] houses = new int[2 * N];
 
-            for (int i = 1; i <= N * 2; i++) {
-                preSum[i] = preSum[i - 1] + (i % N == 0 ? houses[N] : houses[i % N]);
-            }
-            
-            if (N == M) {
-                int answer = preSum[M] < K ? 1 : 0;
-                sb.append(answer + "\n");
-                continue;
-            }
+			for (int i = 0; i < N; i++) {
+				houses[i] = Integer.parseInt(st.nextToken());
+				houses[N + i] = houses[i];
+			}
 
-            // i~j 까지 합 == preSum[j] - preSum[i - 1]
+			int left = 0;
+			int right = M - 1;
+			long sum = 0;
 
-            int left = 1;
-            int right = M;
-            int answer = 0;
+			for (int i = 0; i < M; i++) {
+				sum += houses[i];
+			}
 
-            while (left <= N && right < N * 2) {
-                long sum = preSum[right] - preSum[left - 1];
-                if (sum < K) {
-                    answer++;
-//                    System.out.println("M:" + M + " sum:" + sum + " left:" + left+ " right:" + right + " pL:" + preSum[left - 1]+ " pR:" + preSum[right]);
+			int answer = 0;
 
-                    left++;
-                    right++;
-                } else {
-                    left++;
-                    right++;
-                }
-            }
+			if (M == N) {
+				if (sum < K) answer = 1;
+				else answer = 0;
 
-            sb.append(answer + "\n");
-        }
+				sb.append(answer).append("\n");
+				continue;
+			}
 
-        System.out.println(sb);
-    }
+			if (sum < K) answer = 1;
+
+			while (left < N - 1) {
+				sum -= houses[left];
+				left++;
+				right++;
+				if (right == N * 2) break;
+				sum += houses[right];
+
+				if (sum < K) answer++;
+			}
+
+			sb.append(answer).append("\n");
+		}
+
+		System.out.println(sb);
+	}
 }
-
-/*
-조건
-- 원형으로 N개의 집이 있음.
-- 각자 자신의 집에 돈을 보관.
-- 도둑이 M개의 연속된 집에서 돈을 훔친다.
-- K원 이상 훔치면 안댐.
-
-요구
-- K원 밑으로 M개의 연속된 집에서 훔칠 수 잇는 경우의 수.
-
-풀이
-- 2*N 길이의 누적합을 구함. => 원형 계산 편하려고.
-- 슬라이딩 윈도우로 계산때려.
-
-3   4   7   5   6   4   2   9   3   4   7   5   6   4   2   9
-3   7   14  19  25  29  31  40  43  47  54  59  65  69  71  80
- */
