@@ -1,64 +1,62 @@
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.PriorityQueue;
 
 public class Main {
+	/*
+	조건
+	- 위치에 상관없이 두 수 곱할 수 있다.
+	- 최댓값 구하기
 
-    static int N;
-    static ArrayList<Integer> plus = new ArrayList<>();
-    static ArrayList<Integer> minus = new ArrayList<>();
-    static long sum = 0;
-    static boolean zero = false;
+	풀이
+	- 일단 가장 큰 수와 그 다음으로 큰 수 곱하기
+	- 음수가 있으면 음수끼리
+	- 음수 양수 분리 필요
+	 */
+	public static void main(String[] args) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-    public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer st;
+		int N = Integer.parseInt(br.readLine());
 
-        st = new StringTokenizer(br.readLine());
-        N = Integer.parseInt(st.nextToken());
+		PriorityQueue<Integer> plus = new PriorityQueue<>((a, b) -> b - a);
+		PriorityQueue<Integer> minus = new PriorityQueue<>();
+		int one = 0;
+		int zero = 0;
 
-        for (int i = 0; i < N; i++) {
-            int x = Integer.parseInt(br.readLine());
-            if (x > 0) {
-                plus.add(x);
-            }
-            else if (x < 0) {
-                minus.add(-x);
-            }
-            else if (x==0){
-                zero = true;
-            }
-        }
+		for (int i = 0; i < N; i++) {
+			int a = Integer.parseInt(br.readLine());
 
-        plus.sort(Collections.reverseOrder());
-        minus.sort(Collections.reverseOrder());
+			if (a == 1) {
+				one += 1;
+				continue;
+			}
 
-        for (int i = 0; i < plus.size(); i++) {
-            if (i<plus.size()-1) {
-                //하나가 1인 경우 더하는게 낫다
-                if(plus.get(i)==1 || plus.get(i+1)==1) {
-                    sum+=plus.get(i) + plus.get(i+1);
-                    i++;
-                    continue;
-                }
-                sum += plus.get(i) * plus.get(i+1);
-                i++;
-            }
-        }
-        if (plus.size()%2 != 0){
-            sum += plus.get(plus.size()-1);
-        }
+			if(a > 0) {
+				plus.add(a);
+			} else {
+				minus.add(a);
+			}
+		}
 
-        for (int i = 0; i < minus.size(); i++) {
-            if (i<minus.size()-1) {
-                sum += minus.get(i) * minus.get(i+1);
-                i++;
-            }
-        }
+		int answer = one;
+		while (plus.size() >= 2) {
+			answer += plus.poll() * plus.poll();
+		}
 
-        if (minus.size()%2 != 0 && !zero){
-            sum -= minus.get(minus.size()-1);
-        }
+		while (minus.size() >= 2) {
+			answer += minus.poll() * minus.poll();
+		}
 
-        System.out.println(sum);
-    }
+		if (plus.size() == 1) {
+			answer += plus.poll();
+		}
+
+		if (minus.size() == 1) {
+			answer += minus.poll();
+		}
+
+		System.out.println(answer);
+	}
 }
