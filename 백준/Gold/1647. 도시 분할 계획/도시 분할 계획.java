@@ -5,83 +5,67 @@ import java.util.PriorityQueue;
 import java.util.StringTokenizer;
 
 public class Main {
+	static int[] parent;
+	public static void main(String[] args) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		StringTokenizer st = new StringTokenizer(br.readLine());
 
-    static int N, M;
+		int N = Integer.parseInt(st.nextToken());
+		int M = Integer.parseInt(st.nextToken());
 
-    static int[] parent;
+		parent = new int[N+1];
+		for(int i = 1; i <= N; i++) {
+			parent[i] = i;
+		}
 
-    static PriorityQueue<Edge> pq = new PriorityQueue<>();
+		PriorityQueue<int[]> pq = new PriorityQueue<>((a, b) -> a[2] - b[2]);
 
-    static class Edge implements Comparable<Edge> {
-        int a;
-        int b;
-        int cost;
+		for(int i = 0; i < M; i++) {
+			st = new StringTokenizer(br.readLine());
+			int a = Integer.parseInt(st.nextToken());
+			int b = Integer.parseInt(st.nextToken());
+			int c = Integer.parseInt(st.nextToken());
 
-        public Edge(int a, int b, int cost) {
-            this.a = a;
-            this.b = b;
-            this.cost = cost;
-        }
+			pq.add(new int[] {a, b, c});
+		}
 
-        public int compareTo(Edge o) {
-            return cost - o.cost;
-        }
-    }
+		int cnt = 0;
+		int sum = 0;
+		int max = 0;
 
-    public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer st;
+		while(!pq.isEmpty()) {
+			int[] cur = pq.poll();
 
-        st = new StringTokenizer(br.readLine());
-        N = Integer.parseInt(st.nextToken());
-        M = Integer.parseInt(st.nextToken());
+			if(find(cur[0]) != find(cur[1])) {
+				union(cur[0], cur[1]);
+				sum += cur[2];
+				max = Math.max(max, cur[2]);
+				cnt++;
+			}
+		}
 
-        parent = new int[N + 1];
-        for (int i = 1; i <= N; i++) {
-            parent[i] = i;
-        }
+		System.out.println(sum - max);
+	}
 
-        for (int i = 0; i < M; i++) {
-            st = new StringTokenizer(br.readLine());
-            int a = Integer.parseInt(st.nextToken());
-            int b = Integer.parseInt(st.nextToken());
-            int cost = Integer.parseInt(st.nextToken());
-            pq.add(new Edge(a, b, cost));
-        }
+	static int find(int v) {
+		if (v == parent[v]) return v;
+		return parent[v] = find(parent[v]);
+	}
 
-        int sum = 0;
-        int cnt = 0;
-        int max = 0;
-
-        while (!pq.isEmpty()) {
-            Edge e = pq.poll();
-
-            if(cnt==N-1){
-                break;
-            }
-
-            if(find(e.a)==find(e.b)) continue;
-
-            union(e.a,e.b);
-            sum+=e.cost;
-            cnt++;
-
-            max = Math.max(max,e.cost);
-        }
-
-        System.out.println(sum-max);
-    }
-
-    static void union(int a, int b) {
-        a = find(a);
-        b = find(b);
-
-        if(a>b) parent[b] = a;
-        else parent[a] = b;
-    }
-
-    static int find(int v){
-        if(parent[v] == v) return v;
-        else return parent[v] = find(parent[v]);
-    }
+	static void union(int a, int b) {
+		a = find(a);
+		b = find(b);
+		if (a < b) parent[b] = a;
+		else parent[a] = b;
+	}
 }
+
+/*
+조건
+- N개의 집, M개의 길
+- 각 길마다 길을 유지하는데 드는 유지비가 있음.
+- 마을을 분리한다.
+
+요구
+- 길들을 모두 없애고 나머지 길의 유지비 합을 최소로
+ */
