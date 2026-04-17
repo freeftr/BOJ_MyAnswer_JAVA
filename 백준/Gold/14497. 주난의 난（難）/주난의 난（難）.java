@@ -2,89 +2,82 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayDeque;
+import java.util.Arrays;
+import java.util.Deque;
 import java.util.Queue;
 import java.util.StringTokenizer;
 
 public class Main {
+	/*
+	조건
+	- N * M
+	- 점프를 뛰면 한겹의 학생들이 없어짐
 
-    static int N, M;
-    static int sx, sy, ex, ey;
-    static char[][] map;
-    static int[] dx = {0,0,1,-1};
-    static int[] dy = {1,-1,0,0};
+	요구
+	- 몇번 점프해서 범인(#)을 찾냐
 
-    public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer st = new StringTokenizer(br.readLine());
+	풀이
+	- 다익스트라
+	 */
+	static int[] dx = {0, 0, 1, -1};
+	static int[] dy = {1, -1, 0, 0};
+	public static void main(String[] args) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		StringTokenizer st = new StringTokenizer(br.readLine());
 
-        N = Integer.parseInt(st.nextToken());
-        M = Integer.parseInt(st.nextToken());
+		int N = Integer.parseInt(st.nextToken());
+		int M = Integer.parseInt(st.nextToken());
 
-        st = new StringTokenizer(br.readLine());
-        sx = Integer.parseInt(st.nextToken()) - 1;
-        sy = Integer.parseInt(st.nextToken()) - 1;
-        ex = Integer.parseInt(st.nextToken()) - 1;
-        ey = Integer.parseInt(st.nextToken()) - 1;
+		st = new StringTokenizer(br.readLine());
+		int x1 = Integer.parseInt(st.nextToken()) - 1;
+		int y1 = Integer.parseInt(st.nextToken()) - 1;
+		int x2 = Integer.parseInt(st.nextToken()) - 1;
+		int y2 = Integer.parseInt(st.nextToken()) - 1;
 
-        map = new char[N][M];
+		String[] classroom = new String[N];
 
-        for (int i = 0; i < N; i++) {
-            String s = br.readLine();
-            for (int j = 0; j < M; j++) {
-                map[i][j] = s.charAt(j);
-            }
-        }
+		for (int i = 0; i < N; i++) {
+			classroom[i] = br.readLine();
+		}
 
-        int time = 1;
-        while (true) {
-            boolean result = bfs();
+		int[][] dist = new int[N][M];
 
-            if (result) break;
+		for (int i = 0; i < N; i++) {
+			Arrays.fill(dist[i], Integer.MAX_VALUE);
+		}
 
-            time++;
-        }
+		Deque<int[]> q = new ArrayDeque<>();
+		q.add(new int[]{x1, y1});
+		dist[x1][y1] = 0;
 
-        System.out.println(time);
-    }
+		while (!q.isEmpty()) {
+			int[] cur = q.pollFirst();
+			int x = cur[0];
+			int y = cur[1];
 
-    static boolean bfs() {
-        Queue<int[]> q = new ArrayDeque<>();
-        boolean[][] visited = new boolean[N][M];
 
-        q.add(new int[]{sx, sy});
-        visited[sx][sy] = true;
+			for (int i = 0; i < 4; i++) {
+				int nx = x + dx[i];
+				int ny = y + dy[i];
 
-        while (!q.isEmpty()) {
-            int[] cur = q.poll();
-            int x = cur[0];
-            int y = cur[1];
+				if(nx < 0 || nx >= N || ny < 0 || ny >= M) continue;
 
-            for (int i = 0; i < 4; i++) {
-                int nx = x + dx[i];
-                int ny = y + dy[i];
+				if (classroom[nx].charAt(ny) == '1' || classroom[nx].charAt(ny) == '#') {
+					if (dist[nx][ny] > dist[x][y] + 1) {
+						dist[nx][ny] = dist[x][y] + 1;
+						q.addLast(new int[]{nx, ny});
+					}
+				}
 
-                if (nx < 0 || ny < 0 || nx >= N || ny >= M) continue;
-                if (visited[nx][ny]) continue;
+				if (classroom[nx].charAt(ny) == '0') {
+					if (dist[nx][ny] > dist[x][y]) {
+						dist[nx][ny] = dist[x][y];
+						q.addFirst(new int[]{nx, ny});
+					}
+				}
+			}
+		}
 
-                if (map[nx][ny] == '0') {
-                    visited[nx][ny] = true;
-                    q.add(new int[]{nx, ny});
-                }
-
-                if (map[nx][ny] == '1') {
-                    visited[nx][ny] = true;
-                    map[nx][ny] = '0';
-                }
-
-                if (map[nx][ny] == '#') return true;
-            }
-        }
-
-        return false;
-    }
+		System.out.println(dist[x2][y2]);
+	}
 }
-
-/*
-조건
--
- */
