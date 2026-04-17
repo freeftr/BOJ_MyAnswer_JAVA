@@ -2,116 +2,112 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Queue;
 import java.util.StringTokenizer;
 
 public class Main {
+	/*
+	조건
+	- 바둑을 2개씩 번갈아 둔다.
+	- 죽음 = 그룹 내 빈칸 인접 없음
 
-    static int N, M;
-    static int[][] board;
-    static int[] dx = {0, 0, 1, -1};
-    static int[] dy = {1, -1, 0, 0};
+	요구
+	- 현재 판에서 돌을 2개 두어서 죽일 수 있는 최대 개수 구하기
 
-    public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer st = new StringTokenizer(br.readLine());
+	풀이
+	- 2가 AI돌
+	- 1이 나의 돌
+	1. 빈 칸중 두 개 브루트포스로 선정.
+	2. 2에서 bfs돌려서 생사여부 확인
+	 */
 
-        N = Integer.parseInt(st.nextToken());
-        M = Integer.parseInt(st.nextToken());
+	static int N, M;
+	static int[][] map;
+	public static void main(String[] args) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		StringTokenizer st = new StringTokenizer(br.readLine());
 
-        board = new int[N][M];
+		N = Integer.parseInt(st.nextToken());
+		M = Integer.parseInt(st.nextToken());
 
-        for (int i = 0; i < N; i++) {
-            st = new StringTokenizer(br.readLine());
-            for (int j = 0; j < M; j++) {
-                board[i][j] = Integer.parseInt(st.nextToken());
-            }
-        }
+		map = new int[N][M];
 
-        int answer = 0;
+		ArrayList<int[]> pos = new ArrayList<>();
 
-        for (int i = 0; i < N; i++) {
-            for (int j = 0; j < M; j++) {
-                if (board[i][j] != 0) continue;
-                for (int k = 0; k < N; k++) {
-                    for (int l = 0; l < M; l++) {
-                        if (i == k && j == l) continue;
-                        if (board[k][l] != 0) continue;
-                        board[i][j] = 1;
-                        board[k][l] = 1;
-                        answer = Math.max(answer, bfs());
-                        board[i][j] = 0;
-                        board[k][l] = 0;
-                    }
-                }
-            }
-        }
+		for (int i = 0; i < N; i++) {
+			st = new StringTokenizer(br.readLine());
+			for (int j = 0; j < M; j++) {
+				map[i][j] = Integer.parseInt(st.nextToken());
 
-        System.out.println(answer);
-    }
+				if (map[i][j] == 0) {
+					pos.add(new int[] {i, j});
+				}
+			}
+		}
 
-    static int bfs() {
-        boolean[][] visited = new boolean[N][M];
-        int total = 0;
+		int answer = 0;
 
-        for (int i = 0; i < N; i++) {
-            for (int j = 0; j < M; j++) {
-                if (board[i][j] == 2) {
-                    if (visited[i][j]) continue;
-                    Queue<int[]> q = new ArrayDeque<>();
+		for (int i = 0; i < pos.size() - 1; i++) {
+			for (int j = i + 1; j < pos.size(); j++) {
+				int[] a = pos.get(i);
+				int[] b = pos.get(j);
 
-                    q.add(new int[]{i, j});
-                    visited[i][j] = true;
+				map[a[0]][a[1]] = 1;
+				map[b[0]][b[1]] = 1;
 
-                    int size = 0;
-                    boolean empty = false;
+				int result = bfs();
+				answer = Math.max(answer, result);
 
-                    while (!q.isEmpty()) {
-                        int[] cur = q.poll();
-                        int x = cur[0];
-                        int y = cur[1];
+				map[a[0]][a[1]] = 0;
+				map[b[0]][b[1]] = 0;
+			}
+		}
 
-                        size++;
+		System.out.println(answer);
+	}
 
-                        for (int k = 0; k < 4; k++) {
-                            int nx = x + dx[k];
-                            int ny = y + dy[k];
+	static int bfs() {
+		boolean[][] visited = new boolean[N][M];
+		int result = 0;
 
-                            if (nx < 0 || ny < 0 || nx >= N || ny >= M) continue;
-                            if (visited[nx][ny]) continue;
+		for (int i = 0; i < N; i++) {
+			for (int j = 0; j < M; j++) {
+				if (visited[i][j]) continue;
+				if (map[i][j] == 2) {
+					Queue<int[]> q = new ArrayDeque<>();
+					q.add(new int[]{i, j});
+					visited[i][j] = true;
+					boolean flag = true;
+					int cnt = 0;
 
-                            if (board[nx][ny] == 0) {
-                                empty = true;
-                            }
+					while(!q.isEmpty()) {
+						int[] cur = q.poll();
+						int x = cur[0];
+						int y = cur[1];
+						cnt++;
 
-                            if (board[nx][ny] == 2) {
-                                q.add(new int[]{nx, ny});
-                                visited[nx][ny] = true;
-                            }
-                        }
-                    }
+						for (int[] dir : new int[][] {{0, 1}, {0, -1}, {1, 0}, {-1, 0}}) {
+							int nx = x + dir[0];
+							int ny = y + dir[1];
 
-                    if (empty) continue;
+							if (nx < 0 || nx >= N || ny < 0 || ny >= M) continue;
+							if (visited[nx][ny]) continue;
 
-                    total += size;
-                }
-            }
-        }
+							if (map[nx][ny] == 0) flag = false;
 
-        return total;
-    }
+							if (map[nx][ny] == 2) {
+								q.add(new int[]{nx, ny});
+								visited[nx][ny] = true;
+							}
+						}
+					}
+
+					if (flag) result += cnt;
+				}
+			}
+		}
+
+		return result;
+	}
 }
-
-/*
-조건
-- 양 선수가 돌을 2개씩 둔다.
-- 에워싸임 == 빈 칸과 인접해 있는 돌이 하나도 없다.
-- 빈 칸이 있어도 두면 반대로 죽일 수 있음
-
-요구
-- 현재 판에서 돌 두개를 두어 죽일 수 있는 최대 갯수
-
-풀이
-- 상대 그룹에서 2개 인접하는 거 중 제일 큰거 찾으면 댐
-
- */
