@@ -4,33 +4,26 @@ class Solution {
     boolean solution(String s) {
         boolean answer = true;
         
-        Stack<String> stack = new Stack<>();
+        Stack<Character> stack = new Stack<>();
         
-        String[] letters = s.split("");
-        
-        for (String letter : letters) {
-            if (letter.equals("(")) {
-                stack.push("(");
+        for (int i = 0; i < s.length(); i++) {
+            char cur = s.charAt(i);
+            
+            if (stack.isEmpty()) {
+                stack.add(cur);
             } else {
-                if (stack.isEmpty()) return false;
-                
-                stack.pop();
+                if (stack.peek() == '(' && cur == ')') {
+                    stack.pop();
+                } else if (stack.peek() == '(' && cur == '(') {
+                    stack.add(cur);
+                } else if (stack.peek() == ')') {
+                    return false;
+                }
             }
         }
         
-        answer = stack.isEmpty() ? true : false;
-        
+        if (!stack.isEmpty()) return false;
+
         return answer;
     }
 }
-
-/*
-조건
-- 괄호가 바르게 짝지어졋다. = ()
-
-요구
-- 올바르면 true, 틀리면 false;
-
-풀이
-- 스택
-*/
