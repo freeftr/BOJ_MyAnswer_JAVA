@@ -1,36 +1,32 @@
 class Solution {
     public int solution(int n) {
         int answer = 0;
-        int left = 1;
-        int right = 1;
-        int sum = 1;
         
-        while (right <= n) {
-            if (sum < n) {
-                right++;
-                
-                sum += right;
-            } else if (sum == n) {
+        int a = 1;
+        int b = 1;
+        
+        while (a<=b) {
+            int result = (a + b) * (b - a + 1) / 2;
+            
+            if (result == n) {
                 answer++;
-                sum -= left;
-                left++;
+                a++;
+                continue;
+            } else if (result < n) {
+                b++;
+                continue;
             } else {
-                sum -= left;
-                left++;
+                a++;
             }
         }
-        
         return answer;
     }
 }
 
 /*
-조건
-- 자연수 n을 연속된 자연수의 합으로 표현
-
-요구
-- 연속된 자연수의 합으로 표현하는 방법
+n을 연속된 자연수의 합으로 구하는 경우의 수
 
 풀이
 - 투포인터?
+- 연속된 수의 합 = (a + b) * (b - a + 1) / 2;
 */
