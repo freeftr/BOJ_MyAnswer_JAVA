@@ -1,23 +1,18 @@
-import java.io.*;
 import java.util.*;
 
 class Solution {
     public int solution(String[][] clothes) {
         int answer = 1;
-        HashMap<String, ArrayList<String>> map = new HashMap<>();
+        HashMap<String, Integer> map = new HashMap<>();
         
         for (String[] cloth : clothes) {
-            map.computeIfAbsent(cloth[1], k -> new ArrayList<>()).add(cloth[0]);
+            map.merge(cloth[1], 1, Integer::sum);
         }
         
-        for (String key : map.keySet()) {
-            int size = map.get(key).size();
-            
-            answer *= size + 1;
+        for (int k : map.values()) {
+            answer *= k + 1;
         }
         
-        answer--;
-        
-        return answer;
+        return answer - 1;
     }
 }
