@@ -1,29 +1,39 @@
-import java.util.*;
+import java.util.HashSet;
 
 class Solution {
     public int solution(int[] elements) {
-        int length = elements.length;
-        int[] doubleElements = new int[length * 2];
-        int[] prefix = new int[length * 2 + 1];
+        int answer = 0;
+        int N = elements.length;
+        int[] twice = new int[N * 2];
+        HashSet<Integer> set = new HashSet<>();
 
-        for (int i = 0; i < length * 2; i++) {
-            doubleElements[i] = elements[i % length];
+        for (int i = 0; i < N; i++) {
+            twice[i] = elements[i];
+            twice[i + N] = elements[i];
+            set.add(elements[i]);
         }
-
-        for (int i = 1; i <= length * 2; i++) {
-            prefix[i] = prefix[i - 1] + doubleElements[i - 1];
-        }
-
-        Set<Integer> set = new HashSet<>();
-
-        for (int subLen = 1; subLen <= length; subLen++) {
-            for (int start = 0; start < length; start++) {
-                int end = start + subLen;
-                int sum = prefix[end] - prefix[start];
+        
+        for (int i = 1; i < N; i++) {
+             
+            int left = 0;
+            int right = left + i;
+            int sum = 0;
+            
+            for (int j = left; j <= right; j++) {
+                sum += twice[j];
+            }
+                
+            while (left < N) {
                 set.add(sum);
+                sum -= twice[left++];
+                sum += twice[++right];
             }
         }
-
+        
+        // for (int s : set) {
+        //     System.out.println(s);
+        // }
+        
         return set.size();
     }
 }
